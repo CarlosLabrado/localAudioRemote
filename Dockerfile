@@ -1,6 +1,5 @@
 # Base image
 FROM resin/raspberrypi-python:latest
-ENV DISPLAY_SIZE 2.7
 
 # Set the maintainer
 MAINTAINER Carlos Labrado
@@ -34,6 +33,9 @@ RUN python3 setup.py install
 
 # Copy everything into the container
 COPY . ./
+
+# Systemd please
+ENV INITSYSTEM on
 
 # Start application
 CMD ["bash", "start.sh"]
