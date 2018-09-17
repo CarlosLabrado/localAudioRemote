@@ -35,8 +35,6 @@ RUN python3 setup.py install
 # Copy everything into the container
 COPY . ./
 
-ENV DBUS_SYSTEM_BUS_ADDRESS unix:path=/host/run/dbus/system_bus_socket
-
 # Start application
 CMD ["bash", "start.sh"]
 
