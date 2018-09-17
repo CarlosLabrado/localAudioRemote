@@ -36,5 +36,5 @@ RUN python3 setup.py install
 COPY . ./
 
 # Start application
-CMD ["bash", "start.sh"]
+CMD modprobe i2c-dev && ["bash", "start.sh"]
 
