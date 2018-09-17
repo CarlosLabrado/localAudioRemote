@@ -15,7 +15,6 @@ BLACK = 0
 
 CELLSIZE = 5
 
-
 # Running as root only needed for older Raspbians without /dev/gpiomem
 if not (os.path.exists('/dev/gpiomem') and os.access('/dev/gpiomem', os.R_OK | os.W_OK)):
     user = os.getuid()
@@ -24,99 +23,103 @@ if not (os.path.exists('/dev/gpiomem') and os.access('/dev/gpiomem', os.R_OK | o
         sys.exit()
 
 # Check EPD_SIZE is defined
-EPD_SIZE=0.0
+EPD_SIZE = 0.0
 if os.path.exists('/etc/default/epd-fuse'):
     exec(open('/etc/default/epd-fuse').read())
 if EPD_SIZE == 0.0:
     print("Please select your screen size by running 'papirus-config'.")
     sys.exit()
 
+
 # Colours the cells black for life and white for no life
 def colourGrid(draw, item, lifeDict):
     x = item[0]
     y = item[1]
-    y = y * CELLSIZE # translates array into grid size
-    x = x * CELLSIZE # translates array into grid size
+    y = y * CELLSIZE  # translates array into grid size
+    x = x * CELLSIZE  # translates array into grid size
     if lifeDict[item] == 0:
-        draw.rectangle(( (x, y), (x + CELLSIZE, y + CELLSIZE) ), fill=WHITE, outline=WHITE)
+        draw.rectangle(((x, y), (x + CELLSIZE, y + CELLSIZE)), fill=WHITE, outline=WHITE)
     if lifeDict[item] == 1:
-        draw.rectangle(( (x, y), (x + CELLSIZE, y + CELLSIZE) ), fill=BLACK, outline=WHITE)
+        draw.rectangle(((x, y), (x + CELLSIZE, y + CELLSIZE)), fill=BLACK, outline=WHITE)
     return None
+
 
 # Creates an dictionary of all the cells
 # Sets all cells as dead (0)
 def generateGrid(height, width):
     gridDict = {}
-    #creates dictionary for all cells
-    for y in range (height // CELLSIZE):
-        for x in range (width // CELLSIZE):
-            gridDict[x,y] = 0 #Sets cells as dead
+    # creates dictionary for all cells
+    for y in range(height // CELLSIZE):
+        for x in range(width // CELLSIZE):
+            gridDict[x, y] = 0  # Sets cells as dead
     return gridDict
+
 
 # Assigns a 0 or a 1 to all cells
 def startingGridRandom(lifeDict):
     for item in lifeDict:
-        lifeDict[item] = random.randint(0,1)
+        lifeDict[item] = random.randint(0, 1)
     return lifeDict
 
 
 # Determines how many alive neighbours there are around each cell
-def getNeighbours(epd, item,lifeDict):
+def getNeighbours(epd, item, lifeDict):
     neighbours = 0
-    for x in range (-1,2):
-        for y in range (-1,2):
-            checkCell = (item[0]+x,item[1]+y)
-            if checkCell[0] < (epd.width // CELLSIZE)  and checkCell[0] >=0:
-                if checkCell[1] < (epd.height // CELLSIZE) and checkCell[1]>= 0:
+    for x in range(-1, 2):
+        for y in range(-1, 2):
+            checkCell = (item[0] + x, item[1] + y)
+            if checkCell[0] < (epd.width // CELLSIZE) and checkCell[0] >= 0:
+                if checkCell[1] < (epd.height // CELLSIZE) and checkCell[1] >= 0:
                     if lifeDict[checkCell] == 1:
-                        if x == 0 and y == 0: # negate the central cell
+                        if x == 0 and y == 0:  # negate the central cell
                             neighbours += 0
                         else:
                             neighbours += 1
     return neighbours
 
+
 # Determines the next generation by running a 'tick'
 def tick(epd, lifeDict):
     newTick = {}
     for item in lifeDict:
-        #get number of neighbours for that item
+        # get number of neighbours for that item
         numberNeighbours = getNeighbours(epd, item, lifeDict)
-        if lifeDict[item] == 1: # For those cells already alive
-            if numberNeighbours < 2: # kill under-population
+        if lifeDict[item] == 1:  # For those cells already alive
+            if numberNeighbours < 2:  # kill under-population
                 newTick[item] = 0
-            elif numberNeighbours > 3: #kill over-population
+            elif numberNeighbours > 3:  # kill over-population
                 newTick[item] = 0
             else:
-                newTick[item] = 1 # keep status quo (life)
+                newTick[item] = 1  # keep status quo (life)
         elif lifeDict[item] == 0:
-            if numberNeighbours == 3: # cell reproduces
+            if numberNeighbours == 3:  # cell reproduces
                 newTick[item] = 1
             else:
-                newTick[item] = 0 # keep status quo (death)
+                newTick[item] = 0  # keep status quo (death)
     return newTick
+
 
 # main function
 def main():
-
     epd = Papirus()
     epd.clear()
 
     image = Image.new('1', epd.size, WHITE)
     draw = ImageDraw.Draw(image)
 
-    lifeDict = generateGrid(epd.height, epd.width) # creates library and Populates to match blank grid
-    lifeDict = startingGridRandom(lifeDict) # Assign random life
+    lifeDict = generateGrid(epd.height, epd.width)  # creates library and Populates to match blank grid
+    lifeDict = startingGridRandom(lifeDict)  # Assign random life
 
-    #Colours the live cells, blanks the dead
+    # Colours the live cells, blanks the dead
     for item in lifeDict:
         colourGrid(draw, item, lifeDict)
 
-    while True: #main game loop
+    while True:  # main game loop
 
-        #runs a tick
+        # runs a tick
         lifeDict = tick(epd, lifeDict)
 
-        #Colours the live cells, blanks the dead
+        # Colours the live cells, blanks the dead
         for item in lifeDict:
             colourGrid(draw, item, lifeDict)
 
@@ -124,5 +127,6 @@ def main():
         epd.display(image)
         epd.partial_update()
 
-if __name__=='__main__':
-main()
+
+if __name__ == '__main__':
+    main()
