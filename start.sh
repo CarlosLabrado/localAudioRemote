@@ -8,4 +8,6 @@ systemctl start epd-fuse.service
 
 papirus-set 2.7
 
+papirus-config
+
 python3 /build/papirus/main.py
