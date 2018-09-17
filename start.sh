@@ -8,4 +8,4 @@ systemctl start epd-fuse.service
 
 papirus-set 2.7
 
-python3 /build/papirus/papirus-gol.py
+python3 /build/papirus/papirus-buttons.py
