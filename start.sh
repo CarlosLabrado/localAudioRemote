@@ -3,8 +3,9 @@
 # Make sure i2c is loaded
 modprobe i2c-dev
 
-papirus-set 2.7
+# Start the fuse driver
+systemctl start epd-fuse.service
 
-papirus-config
+papirus-set 2.7
 
 python3 /build/papirus/main.py
