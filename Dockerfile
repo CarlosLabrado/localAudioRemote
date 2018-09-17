@@ -18,6 +18,9 @@ RUN apt-get update && apt-get install -y \
   python3-rpi.gpio \
   && rm -rf /var/lib/apt/lists/*
 
+RUN pip3 install -U \
+  arrow
+
 RUN git clone --depth=1 https://github.com/PiSupply/PaPiRus.git /build/papirus
 RUN git clone https://github.com/repaper/gratis.git /build/gratis
 
