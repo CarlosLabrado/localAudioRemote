@@ -33,6 +33,21 @@ RUN python3 setup.py install
 
 FROM resin/armv7hf-debian:stretch
 
+# Install packages for papirus
+RUN apt-get update && apt-get install -y \
+  git \
+  bc \
+  i2c-tools \
+  fonts-freefont-ttf\
+  libfuse-dev \
+  python3 \
+  python3-pip \
+  python3-pil \
+  python3-smbus \
+  python3-dateutil \
+  && rm -rf /var/lib/apt/lists/*
+
+
 # Configure gratis
 WORKDIR /build/gratis
 # Copy our node_modules into our deployable container context.
