@@ -1,0 +1,50 @@
+I will move this to a wiki eventually but just for compiling succesfully with wheels the zerorpc library you need:
+
+FROM resin/armv7hf-debian:stretch AS buildstep
+
+RUN apt-cache policy
+RUN apt-get update && apt-get install -yq \
+ gcc \
+ python3 \
+ python3-pip \
+ python3-setuptools \
+ python3-dev \
+ libffi-dev \
+ libcurl4-openssl-dev \
+ libzmq3-dev \
+ && \
+ apt-get clean && rm -rf /var/lib/apt/lists/*
+
+RUN pip3 install --upgrade pip
+
+RUN pip3 install wheel
+
+# Install required Python packages
+RUN pip3 wheel --wheel-dir=/root/wheels \
+ cffi==1.11.5 \
+ zerorpc
+
+FROM resin/armv7hf-debian:stretch
+
+RUN apt-cache policy
+RUN apt-get update && apt-get install -yq \
+ python3 \
+ python3-pip \
+ libzmq3-dev \
+ && \
+ apt-get clean && rm -rf /var/lib/apt/lists/*
+
+COPY --from=buildstep /root/wheels /root/wheels
+
+RUN pip3 install --upgrade pip
+
+RUN pip3 install wheel
+
+RUN pip3 install \
+      --no-index \
+      --find-links=/root/wheels \
+ cffi==1.11.5 \
+ zerorpc
+
+which creates an image of about 161MB (the original resin/armv7hf-debian:stretch is 90.3 MB), this is too much I think,
+we are going to try to move on from this library in the future.
