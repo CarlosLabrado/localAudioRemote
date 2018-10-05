@@ -18,6 +18,7 @@ RUN apt-get update && apt-get install -y \
   python3-smbus \
   python3-dateutil \
   python3-rpi.gpio \
+  python3-setuptools \
   libzmq3-dev \
   && rm -rf /var/lib/apt/lists/*
 
