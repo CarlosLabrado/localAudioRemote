@@ -11,6 +11,11 @@ from PIL import ImageDraw
 from PIL import ImageFont
 from time import sleep
 import RPi.GPIO as GPIO
+from zerorpc_client import ZeroClient
+
+"""
+Boilerplate
+"""
 
 # Check EPD_SIZE is defined
 EPD_SIZE = 0.0
@@ -58,8 +63,12 @@ if (os.path.exists(hatdir + '/product')) and (os.path.exists(hatdir + '/vendor')
         SW4 = 21
         SW5 = -1
 
+"""
+Boilerplate
+"""
 
-def main(argv):
+
+def main():
     global SIZE
 
     GPIO.setmode(GPIO.BCM)
@@ -71,7 +80,7 @@ def main(argv):
     if SW5 != -1:
         GPIO.setup(SW5, GPIO.IN)
 
-    papirus = Papirus(rotation=int(argv[0]) if len(sys.argv) > 1 else 0)
+    papirus = Papirus(rotation=0)
 
     # Use smaller font for smaller displays
     if papirus.height <= 96:
@@ -91,6 +100,7 @@ def main(argv):
 
         if GPIO.input(SW1) == False:
             write_text(papirus, "One", SIZE)
+            mute(index=1)
 
         if GPIO.input(SW2) == False:
             write_text(papirus, "Two", SIZE)
@@ -105,6 +115,24 @@ def main(argv):
             write_text(papirus, "Five", SIZE)
 
         sleep(0.1)
+
+
+def mute(index):
+    """
+    Calls to the server one to mute him
+    :return:
+    """
+    if index == 1:
+        client = ZeroClient().get_instance().get_client()
+        client.mute()
+
+def volume_up():
+    client = ZeroClient().get_instance().get_client()
+    client.volume_up()
+
+def volume_down():
+    client = ZeroClient().get_instance().get_client()
+    client.volume_down()
 
 
 def write_text(papirus, text, size):
@@ -144,6 +172,6 @@ def write_text(papirus, text, size):
 
 if __name__ == '__main__':
     try:
-        main(sys.argv[1:])
+        main()
     except KeyboardInterrupt:
         sys.exit('interrupted')
