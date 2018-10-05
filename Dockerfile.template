@@ -25,6 +25,7 @@ RUN pip3 install wheel
 RUN pip3 wheel --wheel-dir=/root/wheels \
  arrow \
  cffi==1.11.5 \
+ RPi.GPIO \
  zerorpc
 
 FROM resin/%%RESIN_MACHINE_NAME%%-debian:stretch
@@ -61,6 +62,7 @@ RUN pip3 install \
       --find-links=/root/wheels \
   arrow \
   cffi==1.11.5 \
+  RPi.GPIO \
   zerorpc
 
 
