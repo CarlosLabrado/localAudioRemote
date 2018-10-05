@@ -35,6 +35,7 @@ RUN pip3 install wheel
 
 # Install required Python packages
 RUN pip3 wheel --wheel-dir=/root/wheels \
+ Cython \
  arrow \
  zerorpc
 
