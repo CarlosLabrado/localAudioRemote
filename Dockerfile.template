@@ -33,6 +33,7 @@ FROM resin/%%RESIN_MACHINE_NAME%%-debian:stretch
 RUN apt-get update && apt-get install -y \
   git \
   bc \
+  make \
   i2c-tools \
   fonts-freefont-ttf\
   whiptail \
