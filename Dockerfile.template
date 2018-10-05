@@ -35,11 +35,10 @@ RUN pip3 install wheel
 
 # Install required Python packages
 RUN pip3 wheel --wheel-dir=/root/wheels \
- Cython \
  arrow \
  zerorpc
 
-FROM resin/armv7hf-debian:stretch
+FROM resin/%%RESIN_MACHINE_NAME%%-debian:stretch
 
 # Install packages
 RUN apt-get update && apt-get install -y \
