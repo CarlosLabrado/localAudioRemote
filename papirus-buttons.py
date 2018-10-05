@@ -88,7 +88,8 @@ def main():
 
     papirus.clear()
 
-    write_text(papirus, "Ready... SW1 + SW2 to exit.", SIZE)
+    # write_text(papirus, "Ready... SW1 + SW2 to exit.", SIZE)
+    write_text(papirus, " ^  v   1   2    Volume  Select", SIZE)
 
     while True:
         # Exit when SW1 and SW2 are pressed simultaneously
