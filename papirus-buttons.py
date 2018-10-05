@@ -105,14 +105,17 @@ def main():
         if GPIO.input(SW2) == False:
             write_text(papirus, "Un-Mute", SIZE)
 
-
         if GPIO.input(SW3) == False:
             write_text(papirus, "Volume UP", SIZE)
             volume_up()
+            volume = get_volume()
+            write_text(papirus, "Volume is {0}".format(volume), SIZE)
 
         if GPIO.input(SW4) == False:
             write_text(papirus, "Volume Down", SIZE)
             volume_down()
+            volume = get_volume()
+            write_text(papirus, "Volume is {0}".format(volume), SIZE)
 
         if (SW5 != -1) and (GPIO.input(SW5) == False):
             write_text(papirus, "Five", SIZE)
@@ -129,18 +132,27 @@ def mute(index):
         client = ZeroClient().get_instance().get_client()
         client.mute()
 
+
 def un_mute(index):
     if index == 1:
         client = ZeroClient().get_instance().get_client()
         client.un_mute()
 
+
 def volume_up():
     client = ZeroClient().get_instance().get_client()
     client.volume_up()
 
+
 def volume_down():
     client = ZeroClient().get_instance().get_client()
     client.volume_down()
+
+
+def get_volume():
+    client = ZeroClient().get_instance().get_client()
+    volume = client.get_volume()
+    return volume
 
 
 def write_text(papirus, text, size):
