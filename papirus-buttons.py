@@ -82,15 +82,12 @@ def main():
 
     text = PapirusTextPos(False, rotation=0)
 
-    text.AddText("△", 30, 10, Id="Up", invert=True)
-    text.AddText("▽", 80, 10, Id="Down", invert=True)
-    text.AddText("1", 130, 10, Id="One", invert=True)
-    text.AddText("2", 170, 10, Id="Two", invert=True)
+    text.AddText("▽", 30, 10, Id="Down")
+    text.AddText("△", 80, 10, Id="Up")
+    text.AddText("1", 130, 10, Id="One")
+    text.AddText("2", 190, 10, Id="Two")
     text.AddText("Ready", 20, 40, Id="Info")
     text.WriteAll()
-
-    # write_text(papirus, "Ready... SW1 + SW2 to exit.", SIZE)
-    # write_text(papirus, " △ ▽   1   2    Volume  Select", SIZE)
 
     while True:
         # Exit when SW1 and SW2 are pressed simultaneously
@@ -98,30 +95,30 @@ def main():
             text.UpdateText("Info", "Exiting")
             # write_text(papirus, "Exiting ...", SIZE)
             sleep(0.2)
-            text.WriteAll()
+            text.partial_update()
             sys.exit()
 
         if GPIO.input(SW1) == False:
             text.UpdateText("Info", "Mute")
-            text.WriteAll()
+            text.partial_update()
             mute(index=1)
 
         if GPIO.input(SW2) == False:
             text.UpdateText("Info", "UnMute")
-            text.WriteAll()
+            text.partial_update()
             un_mute(index=1)
 
         if GPIO.input(SW3) == False:
             volume_up()
             volume = get_volume()
             text.UpdateText("Info", "Volume is {0}".format(volume))
-            text.screen.partial_update()
+            text.partial_update()
 
         if GPIO.input(SW4) == False:
             volume_down()
             volume = get_volume()
             text.UpdateText("Info", "Volume is {0}".format(volume))
-            text.WriteAll()
+            text.partial_update()
 
         sleep(0.1)
 
