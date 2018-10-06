@@ -80,14 +80,6 @@ def main():
     if SW5 != -1:
         GPIO.setup(SW5, GPIO.IN)
 
-    papirus = Papirus(rotation=0)
-
-    # Use smaller font for smaller displays
-    if papirus.height <= 96:
-        SIZE = 18
-
-    papirus.clear()
-
     text = PapirusTextPos(False, rotation=0)
 
     text.AddText("△", 20, 10, Id="Up")
@@ -107,11 +99,9 @@ def main():
             # write_text(papirus, "Exiting ...", SIZE)
             sleep(0.2)
             text.WriteAll()
-            papirus.clear()
             sys.exit()
 
         if GPIO.input(SW1) == False:
-            write_text(papirus, "Mute", SIZE)
             text.UpdateText("Info", "Mute")
             text.WriteAll()
             mute(index=1)
@@ -132,9 +122,6 @@ def main():
             volume = get_volume()
             text.UpdateText("Info", "Volume is {0}".format(volume))
             text.WriteAll()
-
-        if (SW5 != -1) and (GPIO.input(SW5) == False):
-            write_text(papirus, "Five", SIZE)
 
         sleep(0.1)
 
