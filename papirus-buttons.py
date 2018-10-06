@@ -82,11 +82,13 @@ def main():
 
     text = PapirusTextPos(False, rotation=0)
 
-    text.AddText("▽", 30, 10, Id="Down")
-    text.AddText("△", 80, 10, Id="Up")
+    text.AddText("▼▲", 30, 10, Id="Up")
+    text.AddText("▼", 80, 10, Id="Down")
     text.AddText("1", 130, 10, Id="One")
-    text.AddText("2", 190, 10, Id="Two")
-    text.AddText("Ready", 20, 40, Id="Info")
+    text.AddText("2", 180, 10, Id="Two")
+    text.AddText("Volume", 20, 40, Id="Volume")
+    text.AddText("Switcher", 110, 40, Id="Switcher")
+    text.AddText("Ready...", 20, 70, Id="Info")
     text.WriteAll()
 
     while True:
@@ -95,31 +97,27 @@ def main():
             text.UpdateText("Info", "Exiting")
             # write_text(papirus, "Exiting ...", SIZE)
             sleep(0.2)
-            text.partial_update()
             sys.exit()
 
         if GPIO.input(SW1) == False:
             text.UpdateText("Info", "Mute")
-            text.partial_update()
             mute(index=1)
 
         if GPIO.input(SW2) == False:
             text.UpdateText("Info", "UnMute")
-            text.partial_update()
             un_mute(index=1)
 
         if GPIO.input(SW3) == False:
-            volume_up()
-            volume = get_volume()
-            text.UpdateText("Info", "Volume is {0}".format(volume))
-            text.partial_update()
-
-        if GPIO.input(SW4) == False:
             volume_down()
             volume = get_volume()
             text.UpdateText("Info", "Volume is {0}".format(volume))
-            text.partial_update()
 
+        if GPIO.input(SW4) == False:
+            volume_up()
+            volume = get_volume()
+            text.UpdateText("Info", "Volume is {0}".format(volume))
+
+        text.WriteAll(partialUpdate=True)
         sleep(0.1)
 
 
