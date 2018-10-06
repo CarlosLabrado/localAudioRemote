@@ -49,6 +49,8 @@ SW3 = 20
 SW4 = 19
 SW5 = 26
 
+client = ZeroClient().get_instance().get_client()
+
 # Check for HAT, and if detected redefine SW1 .. SW5
 if (os.path.exists(hatdir + '/product')) and (os.path.exists(hatdir + '/vendor')):
     with open(hatdir + '/product') as f:
@@ -82,12 +84,12 @@ def main():
 
     text = PapirusTextPos(False, rotation=0)
 
-    text.AddText("▼▲", 30, 10, Id="Up")
+    text.AddText("▲", 30, 10, Id="Up")
     text.AddText("▼", 80, 10, Id="Down")
     text.AddText("1", 130, 10, Id="One")
     text.AddText("2", 180, 10, Id="Two")
-    text.AddText("Volume", 20, 40, Id="Volume")
-    text.AddText("Switcher", 110, 40, Id="Switcher")
+    text.AddText("Volume", 25, 40, Id="Volume")
+    text.AddText("Switcher", 120, 40, Id="Switcher")
     text.AddText("Ready...", 20, 70, Id="Info")
     text.WriteAll()
 
@@ -127,28 +129,23 @@ def mute(index):
     :return:
     """
     if index == 1:
-        client = ZeroClient().get_instance().get_client()
         client.mute()
 
 
 def un_mute(index):
     if index == 1:
-        client = ZeroClient().get_instance().get_client()
         client.un_mute()
 
 
 def volume_up():
-    client = ZeroClient().get_instance().get_client()
     client.volume_up()
 
 
 def volume_down():
-    client = ZeroClient().get_instance().get_client()
     client.volume_down()
 
 
 def get_volume():
-    client = ZeroClient().get_instance().get_client()
     volume = client.get_volume()
     return volume
 
