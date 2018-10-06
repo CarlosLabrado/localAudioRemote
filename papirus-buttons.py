@@ -5,7 +5,7 @@ from __future__ import print_function
 import os
 import sys
 import string
-from papirus import Papirus
+from papirus import PapirusTextPos
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
@@ -88,35 +88,50 @@ def main():
 
     papirus.clear()
 
+    text = PapirusTextPos(False, rotation=0)
+
+    text.AddText("△", 20, 10, Id="Up")
+    text.AddText("▽", 80, 10, Id="Down")
+    text.AddText("1", 140, 10, Id="One")
+    text.AddText("2", 200, 10, Id="Two")
+    text.AddText("Ready", 20, 40, Id="Info")
+    text.WriteAll()
+
     # write_text(papirus, "Ready... SW1 + SW2 to exit.", SIZE)
-    write_text(papirus, " ^  v   1   2    Volume  Select", SIZE)
+    # write_text(papirus, " △ ▽   1   2    Volume  Select", SIZE)
 
     while True:
         # Exit when SW1 and SW2 are pressed simultaneously
         if (GPIO.input(SW1) == False) and (GPIO.input(SW2) == False):
-            write_text(papirus, "Exiting ...", SIZE)
+            text.UpdateText("Info", "Exiting")
+            # write_text(papirus, "Exiting ...", SIZE)
             sleep(0.2)
+            text.WriteAll()
             papirus.clear()
             sys.exit()
 
         if GPIO.input(SW1) == False:
             write_text(papirus, "Mute", SIZE)
+            text.UpdateText("Info", "Mute")
+            text.WriteAll()
             mute(index=1)
 
         if GPIO.input(SW2) == False:
-            write_text(papirus, "Un-Mute", SIZE)
+            text.UpdateText("Info", "UnMute")
+            text.WriteAll()
+            un_mute(index=1)
 
         if GPIO.input(SW3) == False:
-            write_text(papirus, "Volume UP", SIZE)
             volume_up()
             volume = get_volume()
-            write_text(papirus, "Volume is {0}".format(volume), SIZE)
+            text.UpdateText("Info", "Volume is {0}".format(volume))
+            text.WriteAll()
 
         if GPIO.input(SW4) == False:
-            write_text(papirus, "Volume Down", SIZE)
             volume_down()
             volume = get_volume()
-            write_text(papirus, "Volume is {0}".format(volume), SIZE)
+            text.UpdateText("Info", "Volume is {0}".format(volume))
+            text.WriteAll()
 
         if (SW5 != -1) and (GPIO.input(SW5) == False):
             write_text(papirus, "Five", SIZE)
