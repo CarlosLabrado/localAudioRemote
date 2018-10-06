@@ -82,10 +82,10 @@ def main():
 
     text = PapirusTextPos(False, rotation=0)
 
-    text.AddText("△", 20, 10, Id="Up")
-    text.AddText("▽", 80, 10, Id="Down")
-    text.AddText("1", 140, 10, Id="One")
-    text.AddText("2", 200, 10, Id="Two")
+    text.AddText("△", 30, 10, Id="Up", invert=True)
+    text.AddText("▽", 80, 10, Id="Down", invert=True)
+    text.AddText("1", 130, 10, Id="One", invert=True)
+    text.AddText("2", 170, 10, Id="Two", invert=True)
     text.AddText("Ready", 20, 40, Id="Info")
     text.WriteAll()
 
@@ -115,7 +115,7 @@ def main():
             volume_up()
             volume = get_volume()
             text.UpdateText("Info", "Volume is {0}".format(volume))
-            text.WriteAll()
+            text.screen.partial_update()
 
         if GPIO.input(SW4) == False:
             volume_down()
