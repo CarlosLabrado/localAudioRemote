@@ -29,7 +29,7 @@ def firebase_post(button):
     firebase_data = {
         "buttonPressed": button
     }
-    db.child("testButtons").push(firebase_data)
+    db.child("testButtons").push(firebase_data, user['idToken'])
 
 
 import RPi.GPIO as GPIO
