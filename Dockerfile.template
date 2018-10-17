@@ -11,9 +11,7 @@ RUN apt-get update && apt-get install -yq \
  python3-pip \
  python3-setuptools \
  python3-dev \
- libffi-dev \
  libcurl4-openssl-dev \
- libzmq3-dev \
  && \
  apt-get clean && rm -rf /var/lib/apt/lists/*
 
@@ -24,9 +22,7 @@ RUN pip3 install wheel
 # Install required Python packages
 RUN pip3 wheel --wheel-dir=/root/wheels \
  arrow \
- cffi==1.11.5 \
  RPi.GPIO \
- zerorpc \
  Adafruit-SSD1306
 
 FROM resin/%%RESIN_MACHINE_NAME%%-debian:stretch
@@ -34,17 +30,11 @@ FROM resin/%%RESIN_MACHINE_NAME%%-debian:stretch
 # Install packages
 RUN apt-get update && apt-get install -y \
   git \
-  bc \
   i2c-tools \
-  gcc \
-  pkg-config \
-  libfuse-dev \
   python3 \
   python3-pip \
   python3-pil \
   python3-smbus \
-  python3-dateutil \
-  libzmq3-dev \
   && rm -rf /var/lib/apt/lists/*
 
 RUN apt-get autoclean autoremove
@@ -59,9 +49,7 @@ RUN pip3 install \
       --no-index \
       --find-links=/root/wheels \
   arrow \
-  cffi==1.11.5 \
   RPi.GPIO \
-  zerorpc \
   Adafruit-SSD1306
 
 # Set the working directory
