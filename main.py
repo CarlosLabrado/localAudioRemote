@@ -1,8 +1,34 @@
-from papirus import PapirusTextPos
+import pyrebase
+import os
 
-# Same as calling "PapirusTextPos(True)"
-text = PapirusTextPos()
+email = os.environ['email']
+password = os.environ['password']
 
-# Write text to the screen at selected point, with an Id
-# This will write "hello world" to the screen with white text and a black background
-text.AddText("hello world", 10, 10, Id="Start", invert=True)
+config = {
+    "apiKey": os.environ['apiKey'],
+    "authDomain": os.environ['authDomain'],
+    "databaseURL": os.environ['databaseURL'],
+    "projectId": os.environ['projectId'],
+    "storageBucket": os.environ['storageBucket'],
+    "messagingSenderId": os.environ['messagingSenderId']
+}
+
+firebase = pyrebase.initialize_app(config)
+
+# Get a reference to the auth service
+auth = firebase.auth()
+
+# Log the user in
+user = auth.sign_in_with_email_and_password(email, password)
+
+# Get a reference to the database service
+db = firebase.database()
+
+# data to save
+data = {
+    "name": "Mortimer 'Morty' Smith"
+}
+
+# Pass the user's idToken to the push method
+results = db.child("users").push(data, user['idToken'])
+print(results)

@@ -23,7 +23,8 @@ RUN pip3 install wheel
 RUN pip3 wheel --wheel-dir=/root/wheels \
  arrow \
  RPi.GPIO \
- Adafruit-SSD1306
+ Adafruit-SSD1306 \
+ pyrebase4
 
 FROM resin/%%RESIN_MACHINE_NAME%%-debian:stretch
 
@@ -50,7 +51,9 @@ RUN pip3 install \
       --find-links=/root/wheels \
   arrow \
   RPi.GPIO \
-  Adafruit-SSD1306
+  Adafruit-SSD1306 \
+  pyrebase4
+
 
 # Set the working directory
 WORKDIR /usr/src/app
