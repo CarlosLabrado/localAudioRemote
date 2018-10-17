@@ -26,7 +26,8 @@ RUN pip3 wheel --wheel-dir=/root/wheels \
  arrow \
  cffi==1.11.5 \
  RPi.GPIO \
- zerorpc
+ zerorpc \
+ Adafruit-SSD1306
 
 FROM resin/%%RESIN_MACHINE_NAME%%-debian:stretch
 
@@ -35,9 +36,6 @@ RUN apt-get update && apt-get install -y \
   git \
   bc \
   i2c-tools \
-  fonts-freefont-ttf\
-  whiptail \
-  make \
   gcc \
   pkg-config \
   libfuse-dev \
@@ -63,21 +61,11 @@ RUN pip3 install \
   arrow \
   cffi==1.11.5 \
   RPi.GPIO \
-  zerorpc
+  zerorpc \
+  Adafruit-SSD1306
 
-
-RUN git clone --depth=1 https://github.com/PiSupply/PaPiRus.git /build/papirus
-RUN git clone https://github.com/repaper/gratis.git /build/gratis
-
-# Configure gratis
-WORKDIR /build/gratis
-RUN make rpi EPD_IO=epd_io.h PANEL_VERSION='V231_G2'
-RUN make rpi-install EPD_IO=epd_io.h PANEL_VERSION='V231_G2'
-RUN systemctl enable epd-fuse.service
-
-# Install
-WORKDIR /build/papirus
-RUN python3 setup.py install
+# Set the working directory
+WORKDIR /usr/src/app
 
 # Copy everything into the container
 COPY . ./
