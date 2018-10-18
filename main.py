@@ -39,7 +39,8 @@ class Main:
     for client in all_clients.each():
         if client is not None:
             all_clients_array.append(client.val())
-
+            print(client.val())
+    print(all_clients_array)
     client_array_index = 0
 
     def client_array_left(self):
@@ -47,12 +48,13 @@ class Main:
             self.client_array_index = self.client_array_index - 1
 
     def client_array_right(self):
-        if self.client_array_index < len(self.client_array_index) - 1:
+        if self.client_array_index < len(self.all_clients_array) - 1:
             self.client_array_index = self.client_array_index + 1
 
     def volume_up(self):
         current_client = self.all_clients_array[self.client_array_index]
         val = self.db.child("clients").child(current_client).get(self.user['idToken'])
+        print(val.val())
         volume = val.val()['volume']
         if volume <= 95:
             new_volume = volume + 5
