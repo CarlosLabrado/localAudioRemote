@@ -35,7 +35,7 @@ class Main:
 
     val = db.child("users").child(email_formatted).get(user['idToken'])
     device_UUID = val.val()
-    print(device_UUID)
+    print(device_UUID['deviceUUID'])
 
     def firebase_post(self, button):
         firebase_data = {
