@@ -25,8 +25,6 @@ class Main:
 
     # Log the user in
     user = auth.sign_in_with_email_and_password(email, password)
-    print("user print: {0}".format(user))
-    print("user token: {0}".format(user['idToken']))
 
     # Get a reference to the database service
     db = firebase.database()
@@ -34,8 +32,11 @@ class Main:
     email_formatted = email.replace('.', ',')  # The firebase user can't have dots so we replace them with commas.
 
     val = db.child("users").child(email_formatted).get(user['idToken'])
-    device_UUID = val.val()
-    print(device_UUID['deviceUUID'])
+    device_UUID = val.val()['deviceUUID']
+
+    all_clients = db.child("devices").child(device_UUID).child("clients").get(user['idToken'])
+    for client in all_clients.each():
+        print(client.val())
 
     def firebase_post(self, button):
         firebase_data = {
