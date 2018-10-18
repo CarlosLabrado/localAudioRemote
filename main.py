@@ -187,13 +187,13 @@ class Main:
                     draw.polygon([(0, 30), (18, 21), (18, 41)], outline=255, fill=0)  # left
                 else:  # button is pressed:
                     draw.polygon([(0, 30), (18, 21), (18, 41)], outline=255, fill=1)  # left filled
-                    self.firebase_post(button="left")
+                    self.client_array_left()
 
                 if GPIO.input(R_pin):  # button is released
                     draw.polygon([(60, 30), (42, 21), (42, 41)], outline=255, fill=0)  # right
                 else:  # button is pressed:
                     draw.polygon([(60, 30), (42, 21), (42, 41)], outline=255, fill=1)  # right filled
-                    self.firebase_post(button="right")
+                    self.client_array_right()
 
                 if GPIO.input(D_pin):  # button is released
                     draw.polygon([(30, 60), (40, 42), (20, 42)], outline=255, fill=0)  # down
@@ -211,13 +211,13 @@ class Main:
                     draw.ellipse((70, 40, 90, 60), outline=255, fill=0)  # A button
                 else:  # button is pressed:
                     draw.ellipse((70, 40, 90, 60), outline=255, fill=1)  # A button filled
-                    self.firebase_post(button="A")
+                    self.volume_up()
 
                 if GPIO.input(B_pin):  # button is released
                     draw.ellipse((100, 20, 120, 40), outline=255, fill=0)  # B button
                 else:  # button is pressed:
                     draw.ellipse((100, 20, 120, 40), outline=255, fill=1)  # B button filled
-                    self.firebase_post(button="B")
+                    self.volume_down()
 
                 if not GPIO.input(A_pin) and not GPIO.input(B_pin) and not GPIO.input(C_pin):
                     catImage = Image.open('happycat_oled_64.ppm').convert('1')
