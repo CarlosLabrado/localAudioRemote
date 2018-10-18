@@ -25,6 +25,8 @@ class Main:
 
     # Log the user in
     user = auth.sign_in_with_email_and_password(email, password)
+    print("user print: {0}".format(user))
+    print("user token: {0}".format(user['idToken']))
 
     # Get a reference to the database service
     db = firebase.database()
@@ -34,7 +36,6 @@ class Main:
     val = db.child("users").child(email_formatted).get()
     device_UUID = val.val()
     print(val)
-    print(val["deviceUUID"])
 
     def firebase_post(self, button):
         firebase_data = {
