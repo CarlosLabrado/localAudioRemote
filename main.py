@@ -139,43 +139,43 @@ class Main:
                 draw.polygon([(20, 20), (30, 2), (40, 20)], outline=255, fill=0)  # Up
             else:  # button is pressed:
                 draw.polygon([(20, 20), (30, 2), (40, 20)], outline=255, fill=1)  # Up filled
-                firebase_post("up")
+                firebase_post(button="up")
 
             if GPIO.input(L_pin):  # button is released
                 draw.polygon([(0, 30), (18, 21), (18, 41)], outline=255, fill=0)  # left
             else:  # button is pressed:
                 draw.polygon([(0, 30), (18, 21), (18, 41)], outline=255, fill=1)  # left filled
-                firebase_post("left")
+                firebase_post(button="left")
 
             if GPIO.input(R_pin):  # button is released
                 draw.polygon([(60, 30), (42, 21), (42, 41)], outline=255, fill=0)  # right
             else:  # button is pressed:
                 draw.polygon([(60, 30), (42, 21), (42, 41)], outline=255, fill=1)  # right filled
-                firebase_post("right")
+                firebase_post(button="right")
 
             if GPIO.input(D_pin):  # button is released
                 draw.polygon([(30, 60), (40, 42), (20, 42)], outline=255, fill=0)  # down
             else:  # button is pressed:
                 draw.polygon([(30, 60), (40, 42), (20, 42)], outline=255, fill=1)  # down filled
-                firebase_post("down")
+                firebase_post(button="down")
 
             if GPIO.input(C_pin):  # button is released
                 draw.rectangle((20, 22, 40, 40), outline=255, fill=0)  # center
             else:  # button is pressed:
                 draw.rectangle((20, 22, 40, 40), outline=255, fill=1)  # center filled
-                firebase_post("center")
+                firebase_post(button="center")
 
             if GPIO.input(A_pin):  # button is released
                 draw.ellipse((70, 40, 90, 60), outline=255, fill=0)  # A button
             else:  # button is pressed:
                 draw.ellipse((70, 40, 90, 60), outline=255, fill=1)  # A button filled
-                firebase_post("A")
+                firebase_post(button="A")
 
             if GPIO.input(B_pin):  # button is released
                 draw.ellipse((100, 20, 120, 40), outline=255, fill=0)  # B button
             else:  # button is pressed:
                 draw.ellipse((100, 20, 120, 40), outline=255, fill=1)  # B button filled
-                firebase_post("B")
+                firebase_post(button="B")
 
             if not GPIO.input(A_pin) and not GPIO.input(B_pin) and not GPIO.input(C_pin):
                 catImage = Image.open('happycat_oled_64.ppm').convert('1')
