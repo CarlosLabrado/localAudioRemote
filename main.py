@@ -35,8 +35,38 @@ class Main:
     device_UUID = val.val()['deviceUUID']
 
     all_clients = db.child("devices").child(device_UUID).child("clients").get(user['idToken'])
+    all_clients_array = None
     for client in all_clients.each():
-        print(client.val())
+        if client is not None:
+            all_clients_array.append(client.val())
+
+    client_array_index = 0
+
+    def client_array_left(self):
+        if self.client_array_index < 0:
+            self.client_array_index = self.client_array_index - 1
+
+    def client_array_right(self):
+        if self.client_array_index < len(self.client_array_index) - 1:
+            self.client_array_index = self.client_array_index + 1
+
+    def volume_up(self):
+        current_client = self.all_clients_array[self.client_array_index]
+        val = self.db.child("clients").child(current_client).get(self.user['idToken'])
+        volume = val.val()['volume']
+        if volume <= 95:
+            new_volume = volume + 5
+            self.db.child("clients").child(current_client).update({"volume": "{0}".format(new_volume)},
+                                                                  self.user['idToken'])
+
+    def volume_down(self):
+        current_client = self.all_clients_array[self.client_array_index]
+        val = self.db.child("clients").child(current_client).get(self.user['idToken'])
+        volume = val.val()['volume']
+        if volume >= 5:
+            new_volume = volume - 5
+            self.db.child("clients").child(current_client).update({"volume": "{0}".format(new_volume)},
+                                                                  self.user['idToken'])
 
     def firebase_post(self, button):
         firebase_data = {
