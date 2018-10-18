@@ -33,9 +33,9 @@ class Main:
 
     email_formatted = email.replace('.', ',')  # The firebase user can't have dots so we replace them with commas.
 
-    val = db.child("users").child(email_formatted).get()
+    val = db.child("users").child(email_formatted).get(user['idToken'])
     device_UUID = val.val()
-    print(val)
+    print(val.get("DeviceUUID"))
 
     def firebase_post(self, button):
         firebase_data = {
