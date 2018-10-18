@@ -29,6 +29,13 @@ class Main:
     # Get a reference to the database service
     db = firebase.database()
 
+    email_formatted = email.replace('.', ',')  # The firebase user can't have dots so we replace them with commas.
+
+    val = db.child("users").child(email_formatted).get()
+    device_UUID = val.val()
+    print(val)
+    print(val["deviceUUID"])
+
     def firebase_post(self, button):
         firebase_data = {
             "buttonPressed": button
@@ -40,7 +47,7 @@ class Main:
         now_date = arrow.utcnow()
         delta_date = now_date - self.token_date
         print("time token is been alive {0}".format(delta_date.seconds))
-        if delta_date.seconds >= 3559:  # if more than one hour refresh.
+        if delta_date.seconds >= 1800:  # if more than half an hour refresh.
             current_user = self.auth.refresh(current_user['refreshToken'])
             # now we have a fresh token
             self.token_date = now_date
