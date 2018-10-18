@@ -35,7 +35,7 @@ class Main:
     device_UUID = val.val()['deviceUUID']
 
     all_clients = db.child("devices").child(device_UUID).child("clients").get(user['idToken'])
-    all_clients_array = None
+    all_clients_array = []
     for client in all_clients.each():
         if client is not None:
             all_clients_array.append(client.val())
