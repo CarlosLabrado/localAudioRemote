@@ -39,10 +39,12 @@ class Main:
     def check_token_expired(self, current_user):
         now_date = arrow.utcnow()
         delta_date = now_date - self.token_date
+        print("time token is been alive {0}".format(delta_date.seconds))
         if delta_date.seconds >= 3559:  # if more than one hour refresh.
             current_user = self.auth.refresh(current_user['refreshToken'])
             # now we have a fresh token
             self.token_date = now_date
+            print("token refreshed")
             return current_user
 
     def run_main(self):
