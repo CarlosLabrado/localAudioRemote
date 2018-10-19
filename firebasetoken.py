@@ -49,3 +49,5 @@ class FirebaseToken:
 
     def refresh_token(self):
         self.m_auth.refresh(self.m_user['refreshToken'])
+        print("token refreshed?")
+        print(self.m_user)
