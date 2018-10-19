@@ -2,7 +2,7 @@ import os
 import pyrebase
 
 
-class Token:
+class FirebaseToken:
     # Here will be the instance stored.
     __instance = None
 
@@ -12,14 +12,14 @@ class Token:
     @staticmethod
     def get_instance():
         """ Static access method. """
-        if Token.__instance is None:
-            Token()
-        return Token.__instance
+        if FirebaseToken.__instance is None:
+            FirebaseToken()
+        return FirebaseToken.__instance
 
     def __init__(self):
         """ Virtually private constructor. """
-        if Token.__instance is None:
-            Token.__instance = self
+        if FirebaseToken.__instance is None:
+            FirebaseToken.__instance = self
 
             email = os.environ['email']
             password = os.environ['password']

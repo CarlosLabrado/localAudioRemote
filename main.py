@@ -1,7 +1,7 @@
 import pyrebase
 import os
 import arrow
-from token import Token
+from firebasetoken import FirebaseToken
 
 
 class Main:
@@ -28,7 +28,7 @@ class Main:
 
         firebase = pyrebase.initialize_app(config)
 
-        self.m_user = Token.get_instance().get_user()
+        self.m_user = FirebaseToken.get_instance().get_user()
 
         # Get the token because we need to send it on every call
         self.m_user_token = self.m_user['idToken']
