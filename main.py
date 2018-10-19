@@ -5,14 +5,14 @@ import threading
 try:
 
     tr = TokenRefresher()
-    polling = threading.Thread(target=tr.main())
-    polling.daemon = True
-    polling.start()
+    refresher = threading.Thread(target=tr.main())
+    refresher.daemon = True
+    refresher.start()
 
     audio_remote = AudioRemote()
-    polling = threading.Thread(target=audio_remote.main())
-    polling.daemon = True
-    polling.start()
+    audio = threading.Thread(target=audio_remote.main())
+    audio.daemon = True
+    audio.start()
 
 except Exception as e:
     print("Bad things happened {0}".format(e))
