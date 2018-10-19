@@ -85,25 +85,26 @@ class Main:
             self.m_client_array_index += 1
         self.m_current_client_id = self.m_clients_id_array[self.m_client_array_index]
 
-    def volume_up(self):
+    def volume(self, up=True, amount=5):
+        """
+        Turns volume UP or DOWN by the specified amount
+        :param up: if True then turn volume UP
+        :param amount: defaults to 5
+        :return:
+        """
         client = self.m_clients_info_array[self.m_client_array_index]
         print(client)
         volume = int(client['volume'])
         print("volume is {0}".format(volume))
-        if volume <= 95:
-            new_volume = volume + 5
+        if 5 <= volume <= 95:
+            new_volume = 0
+            if up:
+                new_volume += amount
+            else:
+                new_volume -= amount
+            # because python is pass by reference we can just update this reference and it will update the local object.
             client["volume"] = new_volume
-            self.m_db.child("clients").child(self.m_current_client_id).update({"volume": "{0}".format(new_volume)},
-                                                                              self.m_user_token)
-
-    def volume_down(self):
-        client = self.m_clients_info_array[self.m_client_array_index]
-        print(client)
-        volume = int(client['volume'])
-        print("volume is {0}".format(volume))
-        if volume >= 5:
-            new_volume = volume - 5
-            client["volume"] = new_volume
+            # Firebase call
             self.m_db.child("clients").child(self.m_current_client_id).update({"volume": "{0}".format(new_volume)},
                                                                               self.m_user_token)
 
@@ -250,13 +251,13 @@ class Main:
                     draw.ellipse((70, 40, 90, 60), outline=255, fill=0)  # A button
                 else:  # button is pressed:
                     draw.ellipse((70, 40, 90, 60), outline=255, fill=1)  # A button filled
-                    self.volume_down()
+                    self.volume(up=False)
 
                 if GPIO.input(B_pin):  # button is released
                     draw.ellipse((100, 20, 120, 40), outline=255, fill=0)  # B button
                 else:  # button is pressed:
                     draw.ellipse((100, 20, 120, 40), outline=255, fill=1)  # B button filled
-                    self.volume_up()
+                    self.volume(up=True)
 
                 if not GPIO.input(A_pin) and not GPIO.input(B_pin) and not GPIO.input(C_pin):
                     catImage = Image.open('happycat_oled_64.ppm').convert('1')
