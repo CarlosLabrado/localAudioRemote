@@ -1,14 +1,13 @@
 import pyrebase
 import os
 import arrow
+from token import Token
 
 
 class Main:
-    m_auth = None
     m_user = None
     m_user_token = None
     m_db = None
-    m_token_date = None
     m_clients_id_array = []
     m_client_array_index = 0
 
@@ -17,9 +16,6 @@ class Main:
 
     def __init__(self):
         email = os.environ['email']
-        password = os.environ['password']
-
-        self.m_token_date = arrow.utcnow()
 
         config = {
             "apiKey": os.environ['apiKey'],
@@ -32,11 +28,7 @@ class Main:
 
         firebase = pyrebase.initialize_app(config)
 
-        # Get a reference to the auth service
-        self.m_auth = firebase.auth()
-
-        # Log the user in
-        self.m_user = self.m_auth.sign_in_with_email_and_password(email, password)
+        self.m_user = Token.get_instance().get_user()
 
         # Get the token because we need to send it on every call
         self.m_user_token = self.m_user['idToken']
@@ -76,6 +68,10 @@ class Main:
                 index = index + 1
 
     def client_array_left(self):
+        """
+        Moves to the client on the left of the array, meaning towards the first index.
+        :return:
+        """
         if len(self.m_clients_id_array) > 0:  # only if there are more than one clients we can act
             if self.m_client_array_index > 0:
                 # first mute this client
@@ -86,6 +82,10 @@ class Main:
             self.m_current_client_id = self.m_clients_id_array[self.m_client_array_index]
 
     def client_array_right(self):
+        """
+        Moves to the client on the right of the array, meaning towards the last index.
+        :return:
+        """
         if len(self.m_clients_id_array) > 0:
             if self.m_client_array_index < len(self.m_clients_id_array) - 1:
                 # first mute this client
@@ -138,17 +138,6 @@ class Main:
         }
         self.check_token_expired(self.m_user)
         self.m_db.child("testButtons").update(firebase_data, self.m_user_token)
-
-    def check_token_expired(self, current_user):
-        now_date = arrow.utcnow()
-        delta_date = now_date - self.m_token_date
-        print("time token is been alive {0}".format(delta_date.seconds))
-        if delta_date.seconds >= 1800:  # if more than half an hour refresh.
-            current_user = self.m_auth.refresh(current_user['refreshToken'])
-            # now we have a fresh token
-            self.m_token_date = now_date
-            print("token refreshed")
-            return current_user
 
     def run_main(self):
         import RPi.GPIO as GPIO
@@ -296,6 +285,14 @@ class Main:
         except KeyboardInterrupt:
             GPIO.cleanup()
 
+
+from token_refresher import TokenRefresher
+import threading
+
+tr = TokenRefresher()
+polling = threading.Thread(target=tr.main())
+polling.daemon = True
+polling.start()
 
 main = Main()
 main.run_main()
