@@ -10,7 +10,10 @@ try:
     polling.start()
 
     audio_remote = AudioRemote()
-    audio_remote.main()
+    polling = threading.Thread(target=audio_remote.main())
+    polling.daemon = True
+    polling.start()
+
 except Exception as e:
     print("Bad things happened {0}".format(e))
 while True:
