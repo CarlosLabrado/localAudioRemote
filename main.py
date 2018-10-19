@@ -92,6 +92,7 @@ class Main:
         print("volume is {0}".format(volume))
         if volume <= 95:
             new_volume = volume + 5
+            client["volume"] = new_volume
             self.m_db.child("clients").child(self.m_current_client_id).update({"volume": "{0}".format(new_volume)},
                                                                               self.m_user_token)
 
@@ -102,6 +103,7 @@ class Main:
         print("volume is {0}".format(volume))
         if volume >= 5:
             new_volume = volume - 5
+            client["volume"] = new_volume
             self.m_db.child("clients").child(self.m_current_client_id).update({"volume": "{0}".format(new_volume)},
                                                                               self.m_user_token)
 
