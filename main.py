@@ -77,33 +77,39 @@ class Main:
 
     def client_array_left(self):
         if len(self.m_clients_id_array) > 0:  # only if there are more than one clients we can act
-            self.mute()
             if self.m_client_array_index > 0:
+                # first mute this client
+                self.mute(index=self.m_client_array_index)
                 self.m_client_array_index -= 1
-            self.un_mute()
+            # then un mute the next client
+            self.un_mute(index=self.m_client_array_index)
             self.m_current_client_id = self.m_clients_id_array[self.m_client_array_index]
 
     def client_array_right(self):
         if len(self.m_clients_id_array) > 0:
-            self.mute()
             if self.m_client_array_index < len(self.m_clients_id_array) - 1:
+                # first mute this client
+                self.mute(index=self.m_client_array_index)
                 self.m_client_array_index += 1
-            self.un_mute()
+            # then un mute the next client
+            self.un_mute(index=self.m_client_array_index)
             self.m_current_client_id = self.m_clients_id_array[self.m_client_array_index]
 
-    def mute(self):
+    def mute(self, index):
         # local
-        client = self.m_clients_info_array[self.m_client_array_index]
+        client = self.m_clients_info_array[index]
         client["muted"] = True
         # Firebase
-        self.m_db.child("clients").child(self.m_current_client_id).update({"muted": "True"}, self.m_user_token)
+        client_id = self.m_clients_id_array[index]
+        self.m_db.child("clients").child(client_id).update({"muted": "True"}, self.m_user_token)
 
-    def un_mute(self):
+    def un_mute(self, index):
         # local
-        client = self.m_clients_info_array[self.m_client_array_index]
+        client = self.m_clients_info_array[index]
         client["muted"] = False
         # Firebase
-        self.m_db.child("clients").child(self.m_current_client_id).update({"muted": "False"}, self.m_user_token)
+        client_id = self.m_clients_id_array[index]
+        self.m_db.child("clients").child(client_id).update({"muted": "False"}, self.m_user_token)
 
     def volume(self, up=True, amount=5):
         """
