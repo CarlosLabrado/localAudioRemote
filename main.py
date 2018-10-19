@@ -93,15 +93,13 @@ class Main:
         :return:
         """
         client = self.m_clients_info_array[self.m_client_array_index]
-        print(client)
         volume = int(client['volume'])
-        print("volume is {0}".format(volume))
-        if 5 <= volume <= 95:
-            new_volume = 0
-            if up:
-                new_volume += amount
-            else:
-                new_volume -= amount
+        new_volume = volume
+        if up:
+            new_volume += amount
+        else:
+            new_volume -= amount
+        if 0 <= new_volume <= 100:
             # because python is pass by reference we can just update this reference and it will update the local object.
             client["volume"] = new_volume
             # Firebase call
