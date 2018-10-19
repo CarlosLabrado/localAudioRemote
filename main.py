@@ -49,7 +49,7 @@ class Main:
         val = self.m_db.child("users").child(email_formatted).get(self.m_user_token)
         device_id = val.val()['deviceUUID']
         self.get_clients_info(device_id)
-        print(self.m_clients_info_array)
+        self.m_current_client_id = self.m_clients_id_array[self.m_client_array_index]  # init client id
 
     def get_clients_info(self, device_id):
         """
@@ -77,17 +77,19 @@ class Main:
 
     def client_array_left(self):
         if self.m_client_array_index > 0:
-            self.m_client_array_index = self.m_client_array_index - 1
+            self.m_client_array_index -= 1
         self.m_current_client_id = self.m_clients_id_array[self.m_client_array_index]
 
     def client_array_right(self):
         if self.m_client_array_index < len(self.m_clients_id_array) - 1:
-            self.m_client_array_index = self.m_client_array_index + 1
+            self.m_client_array_index += 1
         self.m_current_client_id = self.m_clients_id_array[self.m_client_array_index]
 
     def volume_up(self):
         client = self.m_clients_info_array[self.m_client_array_index]
+        print(client)
         volume = int(client['volume'])
+        print("volume is {0}".format(volume))
         if volume <= 95:
             new_volume = volume + 5
             self.m_db.child("clients").child(self.m_current_client_id).update({"volume": "{0}".format(new_volume)},
@@ -95,7 +97,9 @@ class Main:
 
     def volume_down(self):
         client = self.m_clients_info_array[self.m_client_array_index]
+        print(client)
         volume = int(client['volume'])
+        print("volume is {0}".format(volume))
         if volume >= 5:
             new_volume = volume - 5
             self.m_db.child("clients").child(self.m_current_client_id).update({"volume": "{0}".format(new_volume)},
