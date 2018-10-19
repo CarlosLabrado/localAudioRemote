@@ -4,10 +4,10 @@ import threading
 
 try:
 
-    tr = TokenRefresher()
-    refresher = threading.Thread(target=tr.main())
-    refresher.daemon = True
-    refresher.start()
+    # tr = TokenRefresher()
+    # refresher = threading.Thread(target=tr.main())
+    # refresher.daemon = True
+    # refresher.start()
 
     audio_remote = AudioRemote()
     audio = threading.Thread(target=audio_remote.main())
