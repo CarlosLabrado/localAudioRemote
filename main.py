@@ -44,17 +44,20 @@ class Main:
     client_array_index = 0
 
     def client_array_left(self):
-        if self.client_array_index < 0:
+        print("index before {0}".format(self.client_array_index))
+        if self.client_array_index > 0:
             self.client_array_index = self.client_array_index - 1
+            print("index after {0}".format(self.client_array_index))
 
     def client_array_right(self):
+        print("index before {0}".format(self.client_array_index))
         if self.client_array_index < len(self.all_clients_array) - 1:
             self.client_array_index = self.client_array_index + 1
+            print("index after {0}".format(self.client_array_index))
 
     def volume_up(self):
         current_client = self.all_clients_array[self.client_array_index]
         val = self.db.child("clients").child(current_client).get(self.user['idToken'])
-        print(val.val())
         volume = int(val.val()['volume'])
         if volume <= 95:
             new_volume = volume + 5
@@ -213,13 +216,13 @@ class Main:
                     draw.ellipse((70, 40, 90, 60), outline=255, fill=0)  # A button
                 else:  # button is pressed:
                     draw.ellipse((70, 40, 90, 60), outline=255, fill=1)  # A button filled
-                    self.volume_up()
+                    self.volume_down()
 
                 if GPIO.input(B_pin):  # button is released
                     draw.ellipse((100, 20, 120, 40), outline=255, fill=0)  # B button
                 else:  # button is pressed:
                     draw.ellipse((100, 20, 120, 40), outline=255, fill=1)  # B button filled
-                    self.volume_down()
+                    self.volume_up()
 
                 if not GPIO.input(A_pin) and not GPIO.input(B_pin) and not GPIO.input(C_pin):
                     catImage = Image.open('happycat_oled_64.ppm').convert('1')
