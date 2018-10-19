@@ -37,7 +37,7 @@ class Main:
     all_clients = db.child("devices").child(device_UUID).child("clients").get(user['idToken'])
     all_clients_array = []
     for client in all_clients.each():
-        if client is not None:
+        if client.val() is not None:
             all_clients_array.append(client.val())
             print(client.val())
     print(all_clients_array)
@@ -55,7 +55,7 @@ class Main:
         current_client = self.all_clients_array[self.client_array_index]
         val = self.db.child("clients").child(current_client).get(self.user['idToken'])
         print(val.val())
-        volume = val.val()['volume']
+        volume = int(val.val()['volume'])
         if volume <= 95:
             new_volume = volume + 5
             self.db.child("clients").child(current_client).update({"volume": "{0}".format(new_volume)},
@@ -64,7 +64,7 @@ class Main:
     def volume_down(self):
         current_client = self.all_clients_array[self.client_array_index]
         val = self.db.child("clients").child(current_client).get(self.user['idToken'])
-        volume = val.val()['volume']
+        volume = int(val.val()['volume'])
         if volume >= 5:
             new_volume = volume - 5
             self.db.child("clients").child(current_client).update({"volume": "{0}".format(new_volume)},
