@@ -1,5 +1,5 @@
 from time import time, sleep
-from firebasetoken import FirebaseToken
+from firebase_token import FirebaseToken
 
 
 class TokenRefresher:
