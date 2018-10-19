@@ -13,6 +13,7 @@ class Main:
     m_client_array_index = 0
 
     m_clients_info_array = []
+    m_current_client_id = None
 
     def __init__(self):
         email = os.environ['email']
@@ -77,28 +78,28 @@ class Main:
     def client_array_left(self):
         if self.m_client_array_index > 0:
             self.m_client_array_index = self.m_client_array_index - 1
+        self.m_current_client_id = self.m_clients_id_array[self.m_client_array_index]
 
     def client_array_right(self):
         if self.m_client_array_index < len(self.m_clients_id_array) - 1:
             self.m_client_array_index = self.m_client_array_index + 1
+        self.m_current_client_id = self.m_clients_id_array[self.m_client_array_index]
 
     def volume_up(self):
-        current_client = self.m_clients_id_array[self.m_client_array_index]
-        val = self.m_db.child("clients").child(current_client).get(self.m_user_token)
-        volume = int(val.val()['volume'])
+        client = self.m_clients_info_array[self.m_client_array_index]
+        volume = int(client['volume'])
         if volume <= 95:
             new_volume = volume + 5
-            self.m_db.child("clients").child(current_client).update({"volume": "{0}".format(new_volume)},
-                                                                    self.m_user_token)
+            self.m_db.child("clients").child(self.m_current_client_id).update({"volume": "{0}".format(new_volume)},
+                                                                              self.m_user_token)
 
     def volume_down(self):
-        current_client = self.m_clients_id_array[self.m_client_array_index]
-        val = self.m_db.child("clients").child(current_client).get(self.m_user_token)
-        volume = int(val.val()['volume'])
+        client = self.m_clients_info_array[self.m_client_array_index]
+        volume = int(client['volume'])
         if volume >= 5:
             new_volume = volume - 5
-            self.m_db.child("clients").child(current_client).update({"volume": "{0}".format(new_volume)},
-                                                                    self.m_user_token)
+            self.m_db.child("clients").child(self.m_current_client_id).update({"volume": "{0}".format(new_volume)},
+                                                                              self.m_user_token)
 
     def firebase_post(self, button):
         firebase_data = {
