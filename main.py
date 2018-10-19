@@ -4,90 +4,117 @@ import arrow
 
 
 class Main:
-    email = os.environ['email']
-    password = os.environ['password']
+    m_auth = None
+    m_user = None
+    m_user_token = None
+    m_db = None
+    m_token_date = None
+    m_clients_id_array = []
+    m_client_array_index = 0
 
-    token_date = arrow.utcnow()
+    m_clients_info_array = []
 
-    config = {
-        "apiKey": os.environ['apiKey'],
-        "authDomain": os.environ['authDomain'],
-        "databaseURL": os.environ['databaseURL'],
-        "projectId": os.environ['projectId'],
-        "storageBucket": os.environ['storageBucket'],
-        "messagingSenderId": os.environ['messagingSenderId']
-    }
+    def __init__(self):
+        email = os.environ['email']
+        password = os.environ['password']
 
-    firebase = pyrebase.initialize_app(config)
+        self.m_token_date = arrow.utcnow()
 
-    # Get a reference to the auth service
-    auth = firebase.auth()
+        config = {
+            "apiKey": os.environ['apiKey'],
+            "authDomain": os.environ['authDomain'],
+            "databaseURL": os.environ['databaseURL'],
+            "projectId": os.environ['projectId'],
+            "storageBucket": os.environ['storageBucket'],
+            "messagingSenderId": os.environ['messagingSenderId']
+        }
 
-    # Log the user in
-    user = auth.sign_in_with_email_and_password(email, password)
+        firebase = pyrebase.initialize_app(config)
 
-    # Get a reference to the database service
-    db = firebase.database()
+        # Get a reference to the auth service
+        self.m_auth = firebase.auth()
 
-    email_formatted = email.replace('.', ',')  # The firebase user can't have dots so we replace them with commas.
+        # Log the user in
+        self.m_user = self.m_auth.sign_in_with_email_and_password(email, password)
 
-    val = db.child("users").child(email_formatted).get(user['idToken'])
-    device_UUID = val.val()['deviceUUID']
+        # Get the token because we need to send it on every call
+        self.m_user_token = self.m_user['idToken']
 
-    all_clients = db.child("devices").child(device_UUID).child("clients").get(user['idToken'])
-    all_clients_array = []
-    for client in all_clients.each():
-        if client.val() is not None:
-            all_clients_array.append(client.val())
-            print(client.val())
-    print(all_clients_array)
-    client_array_index = 0
+        # Get a reference to the database service
+        self.m_db = firebase.database()
+
+        email_formatted = email.replace('.', ',')  # The firebase user can't have dots so we replace them with commas.
+
+        val = self.m_db.child("users").child(email_formatted).get(self.m_user_token)
+        device_id = val.val()['deviceUUID']
+        self.get_clients_info(device_id)
+        print(self.m_clients_info_array)
+
+    def get_clients_info(self, device_id):
+        """
+        Fills the m_clients_info_array with all the clients info, so we don't have to go and get it in every call.
+        :param device_id: Current RPi device UUID in firebase
+        :return:
+        """
+        index = 0
+        all_clients = self.m_db.child("devices").child(device_id).child("clients").get(self.m_user_token)
+        for client in all_clients.each():
+            if client.val() is not None:  # for some reason the first item always comes none
+                if index == 0:
+                    # if is the first one, UN mute it.
+                    self.m_db.child("clients").child(client.val()).update({"muted": "False"}, self.m_user_token)
+                self.m_clients_id_array.append(client.val())
+                client_info_val = self.m_db.child("clients").child(client.val()).get(self.m_user_token)
+                client_info = client_info_val.val()
+                client = {"muted": client_info['muted'],
+                          "name": client_info["name"],
+                          "parent": client_info["parent"],
+                          "type": client_info["type"],
+                          "volume": client_info["volume"]}
+                self.m_clients_info_array.append(client)
+                index = index + 1
 
     def client_array_left(self):
-        print("index before {0}".format(self.client_array_index))
-        if self.client_array_index > 0:
-            self.client_array_index = self.client_array_index - 1
-            print("index after {0}".format(self.client_array_index))
+        if self.m_client_array_index > 0:
+            self.m_client_array_index = self.m_client_array_index - 1
 
     def client_array_right(self):
-        print("index before {0}".format(self.client_array_index))
-        if self.client_array_index < len(self.all_clients_array) - 1:
-            self.client_array_index = self.client_array_index + 1
-            print("index after {0}".format(self.client_array_index))
+        if self.m_client_array_index < len(self.m_clients_id_array) - 1:
+            self.m_client_array_index = self.m_client_array_index + 1
 
     def volume_up(self):
-        current_client = self.all_clients_array[self.client_array_index]
-        val = self.db.child("clients").child(current_client).get(self.user['idToken'])
+        current_client = self.m_clients_id_array[self.m_client_array_index]
+        val = self.m_db.child("clients").child(current_client).get(self.m_user_token)
         volume = int(val.val()['volume'])
         if volume <= 95:
             new_volume = volume + 5
-            self.db.child("clients").child(current_client).update({"volume": "{0}".format(new_volume)},
-                                                                  self.user['idToken'])
+            self.m_db.child("clients").child(current_client).update({"volume": "{0}".format(new_volume)},
+                                                                    self.m_user_token)
 
     def volume_down(self):
-        current_client = self.all_clients_array[self.client_array_index]
-        val = self.db.child("clients").child(current_client).get(self.user['idToken'])
+        current_client = self.m_clients_id_array[self.m_client_array_index]
+        val = self.m_db.child("clients").child(current_client).get(self.m_user_token)
         volume = int(val.val()['volume'])
         if volume >= 5:
             new_volume = volume - 5
-            self.db.child("clients").child(current_client).update({"volume": "{0}".format(new_volume)},
-                                                                  self.user['idToken'])
+            self.m_db.child("clients").child(current_client).update({"volume": "{0}".format(new_volume)},
+                                                                    self.m_user_token)
 
     def firebase_post(self, button):
         firebase_data = {
             "buttonPressed": button
         }
-        self.check_token_expired(self.user)
-        self.db.child("testButtons").update(firebase_data, self.user['idToken'])
+        self.check_token_expired(self.m_user)
+        self.m_db.child("testButtons").update(firebase_data, self.m_user_token)
 
     def check_token_expired(self, current_user):
         now_date = arrow.utcnow()
-        delta_date = now_date - self.token_date
+        delta_date = now_date - self.m_token_date
         print("time token is been alive {0}".format(delta_date.seconds))
         if delta_date.seconds >= 1800:  # if more than half an hour refresh.
-            current_user = self.auth.refresh(current_user['refreshToken'])
+            current_user = self.m_auth.refresh(current_user['refreshToken'])
             # now we have a fresh token
-            self.token_date = now_date
+            self.m_token_date = now_date
             print("token refreshed")
             return current_user
 
