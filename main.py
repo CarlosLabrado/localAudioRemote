@@ -76,14 +76,34 @@ class Main:
                 index = index + 1
 
     def client_array_left(self):
-        if self.m_client_array_index > 0:
-            self.m_client_array_index -= 1
-        self.m_current_client_id = self.m_clients_id_array[self.m_client_array_index]
+        if len(self.m_clients_id_array) > 0:  # only if there are more than one clients we can act
+            self.mute()
+            if self.m_client_array_index > 0:
+                self.m_client_array_index -= 1
+            self.un_mute()
+            self.m_current_client_id = self.m_clients_id_array[self.m_client_array_index]
 
     def client_array_right(self):
-        if self.m_client_array_index < len(self.m_clients_id_array) - 1:
-            self.m_client_array_index += 1
-        self.m_current_client_id = self.m_clients_id_array[self.m_client_array_index]
+        if len(self.m_clients_id_array) > 0:
+            self.mute()
+            if self.m_client_array_index < len(self.m_clients_id_array) - 1:
+                self.m_client_array_index += 1
+            self.un_mute()
+            self.m_current_client_id = self.m_clients_id_array[self.m_client_array_index]
+
+    def mute(self):
+        # local
+        client = self.m_clients_info_array[self.m_client_array_index]
+        client["muted"] = True
+        # Firebase
+        self.m_db.child("clients").child(self.m_current_client_id).update({"muted": "True"}, self.m_user_token)
+
+    def un_mute(self):
+        # local
+        client = self.m_clients_info_array[self.m_client_array_index]
+        client["muted"] = False
+        # Firebase
+        self.m_db.child("clients").child(self.m_current_client_id).update({"muted": "False"}, self.m_user_token)
 
     def volume(self, up=True, amount=5):
         """
