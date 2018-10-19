@@ -1,21 +1,9 @@
-from token_refresher import TokenRefresher
 from audio_remote import AudioRemote
-from threading import Thread
 
 try:
     print("one")
     audio_remote = AudioRemote()
-    audio = Thread(target=audio_remote.main())
-    audio.daemon = True
-    audio.start()
-
-    print("trying to start refresher")
-    tr = TokenRefresher()
-    refresher = Thread(target=tr.main())
-    refresher.daemon = True
-    refresher.start()
-
-    print("is this even reached?")
+    audio_remote.main()
 
 except Exception as e:
     print("Bad things happened {0}".format(e))

@@ -2,6 +2,8 @@ import pyrebase
 import os
 import arrow
 from firebase_token import FirebaseToken
+from time import time, sleep
+from threading import Thread
 
 
 class AudioRemote:
@@ -17,24 +19,13 @@ class AudioRemote:
     def __init__(self):
         email = os.environ['email']
 
-        config = {
-            "apiKey": os.environ['apiKey'],
-            "authDomain": os.environ['authDomain'],
-            "databaseURL": os.environ['databaseURL'],
-            "projectId": os.environ['projectId'],
-            "storageBucket": os.environ['storageBucket'],
-            "messagingSenderId": os.environ['messagingSenderId']
-        }
-
-        firebase = pyrebase.initialize_app(config)
-
         self.m_user = FirebaseToken.get_instance().get_user()
 
         # Get the token because we need to send it on every call
         self.m_user_token = self.m_user['idToken']
 
         # Get a reference to the database service
-        self.m_db = firebase.database()
+        self.m_db = FirebaseToken.get_instance().get_db()
 
         email_formatted = email.replace('.', ',')  # The firebase user can't have dots so we replace them with commas.
 
@@ -42,6 +33,8 @@ class AudioRemote:
         device_id = val.val()['deviceUUID']
         self.get_clients_info(device_id)
         self.m_current_client_id = self.m_clients_id_array[self.m_client_array_index]  # init client id
+
+        Thread(target=self.token_refresher).start()
 
     def get_clients_info(self, device_id):
         """
@@ -66,6 +59,13 @@ class AudioRemote:
                           "volume": client_info["volume"]}
                 self.m_clients_info_array.append(client)
                 index = index + 1
+
+    def token_refresher(self):
+        start_time = time()
+
+        while True:
+            FirebaseToken.get_instance().refresh_token()
+            sleep(30.0 - ((time() - start_time) % 30.0))
 
     def client_array_left(self):
         """

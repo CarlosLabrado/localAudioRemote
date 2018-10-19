@@ -8,6 +8,7 @@ class FirebaseToken:
 
     m_auth = None
     m_user = None
+    m_db = None
 
     @staticmethod
     def get_instance():
@@ -41,11 +42,16 @@ class FirebaseToken:
             # Log the user in
             self.m_user = self.m_auth.sign_in_with_email_and_password(email, password)
 
+            self.m_db = firebase.database()
+
             # Get the token because we need to send it on every call
             m_user_token = self.m_user['idToken']
 
     def get_user(self):
         return self.m_user
+
+    def get_db(self):
+        return self.m_db
 
     def refresh_token(self):
         self.m_auth.refresh(self.m_user['refreshToken'])
