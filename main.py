@@ -1,7 +1,6 @@
 from audio_remote import AudioRemote
 
 try:
-    print("one")
     audio_remote = AudioRemote()
     audio_remote.main()
 

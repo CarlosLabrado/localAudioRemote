@@ -3,6 +3,9 @@ import pyrebase
 
 
 class FirebaseToken:
+    """
+    Full firebase initialization, passes the user and database with getters.
+    """
     # Here will be the instance stored.
     __instance = None
 
@@ -55,5 +58,4 @@ class FirebaseToken:
 
     def refresh_token(self):
         self.m_auth.refresh(self.m_user['refreshToken'])
-        print("token refreshed?")
-        print(self.m_user)
+

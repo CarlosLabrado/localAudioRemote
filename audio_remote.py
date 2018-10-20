@@ -17,6 +17,9 @@ class AudioRemote:
     m_current_client_id = None
 
     def __init__(self):
+        """
+        The firebase initialization takes place in the firebase_token.py
+        """
         email = os.environ['email']
 
         self.m_user = FirebaseToken.get_instance().get_user()
@@ -61,11 +64,15 @@ class AudioRemote:
                 index = index + 1
 
     def token_refresher(self):
+        """
+        Refreshes the token after half an hour. Runs on a thread.
+        :return:
+        """
         start_time = time()
 
         while True:
             FirebaseToken.get_instance().refresh_token()
-            sleep(30.0 - ((time() - start_time) % 30.0))
+            sleep(1800.0 - ((time() - start_time) % 1800.0))
 
     def client_array_left(self):
         """
