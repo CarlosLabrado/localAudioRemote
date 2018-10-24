@@ -238,29 +238,29 @@ class AudioRemote:
             while 1:
                 """ UP """
                 if GPIO.input(U_pin):  # button is released
-                    draw.polygon([(54, 3), (58, 10), (49, 10)], outline=255, fill=0)  # Up
+                    draw.polygon([(54, 0), (58, 7), (50, 7)], outline=255, fill=0)  # Up
                 else:  # button is pressed:
-                    draw.polygon([(54, 3), (58, 10), (49, 10)], outline=255, fill=1)  # Up filled
+                    draw.polygon([(54, 0), (58, 7), (50, 7)], outline=255, fill=1)  # Up filled
                     self.firebase_post(button="up")
 
                 """ DOWN """
                 if GPIO.input(D_pin):  # button is released
-                    draw.polygon([(50, 54), (58, 54), (54, 61)], outline=255, fill=0)  # down
+                    draw.polygon([(50, 57), (58, 57), (54, 64)], outline=255, fill=0)  # down
                 else:  # button is pressed:
-                    draw.polygon([(50, 54), (58, 54), (54, 61)], outline=255, fill=1)  # down filled
+                    draw.polygon([(50, 57), (58, 57), (54, 64)], outline=255, fill=1)  # down filled
 
                 """ LEFT """
                 if GPIO.input(L_pin):  # button is released
-                    draw.polygon([(16, 24), (16, 40), (4, 32)], outline=255, fill=0)  # left
+                    draw.polygon([(12, 24), (12, 40), (0, 32)], outline=255, fill=0)  # left
                 else:  # button is pressed:
-                    draw.polygon([(16, 24), (16, 40), (4, 32)], outline=255, fill=1)  # left filled
+                    draw.polygon([(12, 24), (12, 40), (0, 32)], outline=255, fill=1)  # left filled
                     self.client_array_left()
 
                 """ RIGHT """
                 if GPIO.input(R_pin):  # button is released
-                    draw.polygon([(92, 24), (105, 32), (92, 40)], outline=255, fill=0)  # right
+                    draw.polygon([(97, 24), (110, 32), (97, 40)], outline=255, fill=0)  # right
                 else:  # button is pressed:
-                    draw.polygon([(92, 24), (105, 32), (92, 40)], outline=255, fill=1)  # right filled
+                    draw.polygon([(97, 24), (110, 32), (97, 40)], outline=255, fill=1)  # right filled
                     self.client_array_right()
 
                     self.firebase_post(button="down")
@@ -273,19 +273,19 @@ class AudioRemote:
                     draw.rectangle((20, 22, 40, 40), outline=255, fill=1)  # center filled
                     self.firebase_post(button="center")
 
+                """ B button (Volume up)"""
+                if GPIO.input(B_pin):  # button is released
+                    draw.polygon([(121, 11), (128, 22), (114, 22)], outline=255, fill=0)  # B
+                else:  # button is pressed:
+                    draw.polygon([(121, 11), (128, 22), (114, 22)], outline=255, fill=1)  # B filled
+                    self.volume(up=True)
+
                 """ A button """
                 if GPIO.input(A_pin):  # button is released
-                    draw.polygon([(109, 43), (123, 43), (116, 54)], outline=255, fill=0)  # A
+                    draw.polygon([(114, 43), (128, 43), (121, 54)], outline=255, fill=0)  # A
                 else:  # button is pressed:
-                    draw.polygon([(109, 43), (123, 43), (116, 54)], outline=255, fill=1)  # A filled
+                    draw.polygon([(114, 43), (128, 43), (121, 54)], outline=255, fill=1)  # A filled
                     self.volume(up=False)
-
-                """ B button """
-                if GPIO.input(B_pin):  # button is released
-                    draw.polygon([(116, 11), (123, 22), (109, 22)], outline=255, fill=0)  # B
-                else:  # button is pressed:
-                    draw.polygon([(116, 11), (123, 22), (109, 22)], outline=255, fill=1)  # B filled
-                    self.volume(up=True)
 
                 if not GPIO.input(A_pin) and not GPIO.input(B_pin) and not GPIO.input(C_pin):
                     # catImage = Image.open('happycat_oled_64.ppm').convert('1')
