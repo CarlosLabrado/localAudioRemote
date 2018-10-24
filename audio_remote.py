@@ -15,6 +15,7 @@ class AudioRemote:
 
     m_clients_info_array = []
     m_current_client_id = None
+    m_total_clients = 0
 
     def __init__(self):
         """
@@ -35,6 +36,7 @@ class AudioRemote:
         val = self.m_db.child("users").child(email_formatted).get(self.m_user_token)
         device_id = val.val()['deviceUUID']
         self.get_clients_info(device_id)
+        self.m_total_clients = len(self.m_clients_id_array)
         self.m_current_client_id = self.m_clients_id_array[self.m_client_array_index]  # init client id
 
         Thread(target=self.token_refresher).start()
@@ -240,6 +242,8 @@ class AudioRemote:
 
         draw.rectangle((12, 7, 97, 56), outline=0, fill=0)
 
+        minute_check = arrow.utcnow()
+
         try:
             while 1:
 
@@ -250,13 +254,24 @@ class AudioRemote:
 
                 volume = int(client['volume'])
                 if volume == 100:
-                    draw.text((114, 28), "MX", font=font, fill=255)
+                    draw.text((114, 25), "MX", font=font, fill=255)
                 else:
-                    draw.text((114, 28), "{0}".format(volume), font=font, fill=255)
+                    draw.text((114, 25), "{0}".format(volume), font=font, fill=255)
 
+                selected = "{0}/{1}".format(self.m_client_array_index + 1, self.m_total_clients)
+
+                draw.text((2, 1), selected, font=font, fill=255)  # draws the order on the corner
                 draw.text((14, 14), client['name'], font=font, fill=255)
                 draw.text((14, 28), client['type'], font=font, fill=255)
-                draw.text((14, 43), "TEST", font=font, fill=255)
+
+                utc = arrow.utcnow()
+                time_passed = utc - minute_check
+                # clear middle every minute
+                if time_passed.seconds > 60:
+                    clear_middle = True
+                local = utc.to('US/Mountain')
+                date = "{0}:{1}".format(local.hour, local.minute)
+                draw.text((14, 43), date, font=font, fill=255)
 
                 """ UP """
                 if GPIO.input(U_pin):  # button is released
@@ -330,7 +345,7 @@ class AudioRemote:
 
                 if clear_volume:
                     # Draw a black filled box to clear the volume section.
-                    draw.rectangle((110, 28, 128, 43), outline=0, fill=0)
+                    draw.rectangle((110, 25, 128, 43), outline=0, fill=0)
 
                 disp.display()
                 time.sleep(.01)
