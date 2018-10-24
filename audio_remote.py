@@ -236,7 +236,7 @@ class AudioRemote:
         # Draw a black filled box to clear the image.
         draw.rectangle((0, 0, width, height), outline=0, fill=0)
 
-        font = ImageFont.truetype('/usr/src/app/fonts/VCR_OSD_MONO_1.001.ttf', 10)
+        font = ImageFont.truetype('/usr/src/app/fonts/VCR_OSD_MONO_1.001.ttf', 12)
 
         try:
             while 1:
@@ -245,6 +245,8 @@ class AudioRemote:
                 draw.text((40, 28), "TEST", font=font, fill=255)
 
                 volume = int(client['volume'])
+                draw.text((114, 28), "{0}".format(volume), font=font, fill=255)
+                print("volume is : {0}".format(volume))
 
                 """ UP """
                 if GPIO.input(U_pin):  # button is released
@@ -288,16 +290,15 @@ class AudioRemote:
                     draw.polygon([(121, 8), (128, 19), (114, 19)], outline=255, fill=0)  # B
                 else:  # button is pressed:
                     draw.polygon([(121, 8), (128, 19), (114, 19)], outline=255, fill=1)  # B filled
-                    volume = self.volume(up=True)
+                    self.volume(up=True)
 
                 """ A button """
                 if GPIO.input(A_pin):  # button is released
                     draw.polygon([(114, 43), (128, 43), (121, 54)], outline=255, fill=0)  # A
                 else:  # button is pressed:
                     draw.polygon([(114, 43), (128, 43), (121, 54)], outline=255, fill=1)  # A filled
-                    volume = self.volume(up=False)
+                    self.volume(up=False)
 
-                draw.text((114, 28), "{0}".format(volume), font=font, fill=255)
 
                 if not GPIO.input(A_pin) and not GPIO.input(B_pin) and not GPIO.input(C_pin):
                     # catImage = Image.open('happycat_oled_64.ppm').convert('1')
