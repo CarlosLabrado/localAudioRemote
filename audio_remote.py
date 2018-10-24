@@ -351,8 +351,8 @@ class AudioRemote:
                     draw.rectangle((110, 25, 128, 43), outline=0, fill=0)
 
                 if clear_top_left:
-                    # Draw a black filled box to clear the volume section.
-                    draw.rectangle((2, 1, 24, 1), outline=0, fill=0)
+                    # Draw a black filled box to clear the index section.
+                    draw.rectangle((2, 1, 24, 10), outline=0, fill=0)
 
                 disp.display()
                 time.sleep(.01)
