@@ -143,7 +143,6 @@ class AudioRemote:
         firebase_data = {
             "buttonPressed": button
         }
-        self.check_token_expired(self.m_user)
         self.m_db.child("testButtons").update(firebase_data, self.m_user_token)
 
     def main(self):
@@ -237,28 +236,37 @@ class AudioRemote:
 
         try:
             while 1:
+                """ UP """
                 if GPIO.input(U_pin):  # button is released
-                    draw.polygon([(20, 20), (30, 2), (40, 20)], outline=255, fill=0)  # Up
+                    # draw.polygon([(20, 20), (30, 2), (40, 20)], outline=255, fill=0)  # Up
+                    draw.polygon([(53, 3), (58, 10), (49, 10)], outline=255, fill=0)  # Up
                 else:  # button is pressed:
-                    draw.polygon([(20, 20), (30, 2), (40, 20)], outline=255, fill=1)  # Up filled
+                    draw.polygon([(53, 3), (58, 10), (49, 10)], outline=255, fill=1)  # Up filled
                     self.firebase_post(button="up")
 
-                if GPIO.input(L_pin):  # button is released
-                    draw.polygon([(0, 30), (18, 21), (18, 41)], outline=255, fill=0)  # left
+                """ DOWN """
+                if GPIO.input(D_pin):  # button is released
+                    # draw.polygon([(30, 60), (40, 42), (20, 42)], outline=255, fill=0)  # down
+                    draw.polygon([(50, 54), (58, 55), (54, 61)], outline=255, fill=0)  # down
                 else:  # button is pressed:
-                    draw.polygon([(0, 30), (18, 21), (18, 41)], outline=255, fill=1)  # left filled
+                    draw.polygon([(50, 54), (58, 55), (54, 61)], outline=255, fill=1)  # down filled
+
+                """ LEFT """
+                if GPIO.input(L_pin):  # button is released
+                    # draw.polygon([(0, 30), (18, 21), (18, 41)], outline=255, fill=0)  # left
+                    draw.polygon([(16, 24), (16, 40), (4, 32)], outline=255, fill=0)  # left
+                else:  # button is pressed:
+                    draw.polygon([(16, 24), (16, 40), (4, 32)], outline=255, fill=1)  # left filled
                     self.client_array_left()
 
+                """ RIGHT """
                 if GPIO.input(R_pin):  # button is released
-                    draw.polygon([(60, 30), (42, 21), (42, 41)], outline=255, fill=0)  # right
+                    # draw.polygon([(60, 30), (42, 21), (42, 41)], outline=255, fill=0)  # right
+                    draw.polygon([(92, 24), (105, 32), (92, 40)], outline=255, fill=0)  # right
                 else:  # button is pressed:
-                    draw.polygon([(60, 30), (42, 21), (42, 41)], outline=255, fill=1)  # right filled
+                    draw.polygon([(92, 24), (105, 32), (92, 40)], outline=255, fill=1)  # right filled
                     self.client_array_right()
 
-                if GPIO.input(D_pin):  # button is released
-                    draw.polygon([(30, 60), (40, 42), (20, 42)], outline=255, fill=0)  # down
-                else:  # button is pressed:
-                    draw.polygon([(30, 60), (40, 42), (20, 42)], outline=255, fill=1)  # down filled
                     self.firebase_post(button="down")
 
                 if GPIO.input(C_pin):  # button is released
@@ -267,21 +275,26 @@ class AudioRemote:
                     draw.rectangle((20, 22, 40, 40), outline=255, fill=1)  # center filled
                     self.firebase_post(button="center")
 
+                """ A button """
                 if GPIO.input(A_pin):  # button is released
-                    draw.ellipse((70, 40, 90, 60), outline=255, fill=0)  # A button
+                    # draw.ellipse((70, 40, 90, 60), outline=255, fill=0)  # A button
+                    draw.polygon([(109, 43), (123, 43), (116, 54)], outline=255, fill=0)  # A
                 else:  # button is pressed:
-                    draw.ellipse((70, 40, 90, 60), outline=255, fill=1)  # A button filled
+                    draw.polygon([(109, 43), (123, 43), (116, 54)], outline=255, fill=1)  # A filled
                     self.volume(up=False)
 
+                """ B button """
                 if GPIO.input(B_pin):  # button is released
-                    draw.ellipse((100, 20, 120, 40), outline=255, fill=0)  # B button
+                    # draw.ellipse((100, 20, 120, 40), outline=255, fill=0)  # B button
+                    draw.polygon([(116, 11), (123, 22), (109, 22)], outline=255, fill=0)  # B
                 else:  # button is pressed:
-                    draw.ellipse((100, 20, 120, 40), outline=255, fill=1)  # B button filled
+                    draw.polygon([(116, 11), (123, 22), (109, 22)], outline=255, fill=1)  # B filled
                     self.volume(up=True)
 
                 if not GPIO.input(A_pin) and not GPIO.input(B_pin) and not GPIO.input(C_pin):
-                    catImage = Image.open('happycat_oled_64.ppm').convert('1')
-                    disp.image(catImage)
+                    # catImage = Image.open('happycat_oled_64.ppm').convert('1')
+                    # disp.image(catImage)
+                    print("A B and C")
                 else:
                     # Display image.
                     disp.image(image)
