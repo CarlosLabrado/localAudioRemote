@@ -238,14 +238,27 @@ class AudioRemote:
 
         font = ImageFont.truetype('/usr/src/app/fonts/VCR_OSD_MONO_1.001.ttf', 12)
 
+        draw.rectangle((12, 7, 97, 56), outline=0, fill=0)
+
         try:
             while 1:
+
+                clear_middle = False
+                clear_volume = False
+
                 client = self.m_clients_info_array[self.m_client_array_index]
 
                 draw.text((40, 28), "TEST", font=font, fill=255)
 
                 volume = int(client['volume'])
-                draw.text((114, 28), "{0}".format(volume), font=font, fill=255)
+                if volume == 100:
+                    draw.text((114, 28), "MX", font=font, fill=255)
+                else:
+                    draw.text((114, 28), "{0}".format(volume), font=font, fill=255)
+
+                draw.text((14, 14), client['name'], font=font, fill=255)
+                draw.text((14, 28), client['type'], font=font, fill=255)
+                draw.text((14, 43), "TEST", font=font, fill=255)
 
                 """ UP """
                 if GPIO.input(U_pin):  # button is released
@@ -253,12 +266,15 @@ class AudioRemote:
                 else:  # button is pressed:
                     draw.polygon([(54, 0), (58, 7), (50, 7)], outline=255, fill=1)  # Up filled
                     self.firebase_post(button="up")
+                    clear_middle = True
 
                 """ DOWN """
                 if GPIO.input(D_pin):  # button is released
                     draw.polygon([(50, 56), (58, 56), (54, 63)], outline=255, fill=0)  # down
                 else:  # button is pressed:
                     draw.polygon([(50, 56), (58, 56), (54, 63)], outline=255, fill=1)  # down filled
+                    self.firebase_post(button="down")
+                    clear_middle = True
 
                 """ LEFT """
                 if GPIO.input(L_pin):  # button is released
@@ -266,6 +282,7 @@ class AudioRemote:
                 else:  # button is pressed:
                     draw.polygon([(12, 24), (12, 40), (0, 32)], outline=255, fill=1)  # left filled
                     self.client_array_left()
+                    clear_middle = True
 
                 """ RIGHT """
                 if GPIO.input(R_pin):  # button is released
@@ -273,8 +290,7 @@ class AudioRemote:
                 else:  # button is pressed:
                     draw.polygon([(97, 24), (110, 32), (97, 40)], outline=255, fill=1)  # right filled
                     self.client_array_right()
-
-                    self.firebase_post(button="down")
+                    clear_middle = True
 
                 """ CENTER button """
                 if GPIO.input(C_pin):  # button is released
@@ -290,8 +306,7 @@ class AudioRemote:
                 else:  # button is pressed:
                     draw.polygon([(121, 8), (128, 19), (114, 19)], outline=255, fill=1)  # B filled
                     self.volume(up=True)
-                    # Draw a black filled box to clear the section.
-                    draw.rectangle((110, 28, 128, 43), outline=0, fill=0)
+                    clear_volume = True
 
                 """ A button """
                 if GPIO.input(A_pin):  # button is released
@@ -299,8 +314,7 @@ class AudioRemote:
                 else:  # button is pressed:
                     draw.polygon([(114, 43), (128, 43), (121, 54)], outline=255, fill=1)  # A filled
                     self.volume(up=False)
-                    # Draw a black filled box to clear the section.
-                    draw.rectangle((110, 28, 128, 43), outline=0, fill=0)
+                    clear_volume = True
 
                 if not GPIO.input(A_pin) and not GPIO.input(B_pin) and not GPIO.input(C_pin):
                     # catImage = Image.open('happycat_oled_64.ppm').convert('1')
@@ -309,6 +323,14 @@ class AudioRemote:
                 else:
                     # Display image.
                     disp.image(image)
+
+                if clear_middle:
+                    # clear middle
+                    draw.rectangle((12, 7, 97, 56), outline=0, fill=0)
+
+                if clear_volume:
+                    # Draw a black filled box to clear the volume section.
+                    draw.rectangle((110, 28, 128, 43), outline=0, fill=0)
 
                 disp.display()
                 time.sleep(.01)
