@@ -246,7 +246,6 @@ class AudioRemote:
 
                 volume = int(client['volume'])
                 draw.text((114, 28), "{0}".format(volume), font=font, fill=255)
-                print("volume is : {0}".format(volume))
 
                 """ UP """
                 if GPIO.input(U_pin):  # button is released
@@ -291,6 +290,8 @@ class AudioRemote:
                 else:  # button is pressed:
                     draw.polygon([(121, 8), (128, 19), (114, 19)], outline=255, fill=1)  # B filled
                     self.volume(up=True)
+                    # Draw a black filled box to clear the section.
+                    draw.rectangle((110, 28, 128, 43), outline=0, fill=0)
 
                 """ A button """
                 if GPIO.input(A_pin):  # button is released
@@ -298,7 +299,8 @@ class AudioRemote:
                 else:  # button is pressed:
                     draw.polygon([(114, 43), (128, 43), (121, 54)], outline=255, fill=1)  # A filled
                     self.volume(up=False)
-
+                    # Draw a black filled box to clear the section.
+                    draw.rectangle((110, 28, 128, 43), outline=0, fill=0)
 
                 if not GPIO.input(A_pin) and not GPIO.input(B_pin) and not GPIO.input(C_pin):
                     # catImage = Image.open('happycat_oled_64.ppm').convert('1')
