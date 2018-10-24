@@ -234,7 +234,7 @@ class AudioRemote:
         # Draw a black filled box to clear the image.
         draw.rectangle((0, 0, width, height), outline=0, fill=0)
 
-        font = ImageFont.truetype('/fonts/VCR_OSD_MONO_1.001.ttf', 10)
+        font = ImageFont.truetype('/usr/src/app/fonts/VCR_OSD_MONO_1.001.ttf', 10)
 
         try:
             while 1:
