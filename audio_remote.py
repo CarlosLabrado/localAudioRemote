@@ -249,6 +249,7 @@ class AudioRemote:
 
                 clear_middle = False
                 clear_volume = False
+                clear_top_left = False
 
                 client = self.m_clients_info_array[self.m_client_array_index]
 
@@ -297,6 +298,7 @@ class AudioRemote:
                     self.client_array_left()
                     clear_middle = True
                     clear_volume = True
+                    clear_top_left = True
 
                 """ RIGHT """
                 if GPIO.input(R_pin):  # button is released
@@ -306,6 +308,7 @@ class AudioRemote:
                     self.client_array_right()
                     clear_middle = True
                     clear_volume = True
+                    clear_top_left = True
 
                 """ CENTER button """
                 if GPIO.input(C_pin):  # button is released
@@ -346,6 +349,10 @@ class AudioRemote:
                 if clear_volume:
                     # Draw a black filled box to clear the volume section.
                     draw.rectangle((110, 25, 128, 43), outline=0, fill=0)
+
+                if clear_top_left:
+                    # Draw a black filled box to clear the volume section.
+                    draw.rectangle((2, 1, 24, 1), outline=0, fill=0)
 
                 disp.display()
                 time.sleep(.01)
