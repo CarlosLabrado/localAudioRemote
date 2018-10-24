@@ -234,12 +234,12 @@ class AudioRemote:
         # Draw a black filled box to clear the image.
         draw.rectangle((0, 0, width, height), outline=0, fill=0)
 
-        font = ImageFont.load_default()
+        font = ImageFont.truetype('/fonts/VCR_OSD_MONO_1.001.ttf', 10)
 
         try:
             while 1:
 
-                draw.text((40, 28), "Test", font=font, fill=255)
+                draw.text((40, 28), "TEST", font=font, fill=255)
 
                 """ UP """
                 if GPIO.input(U_pin):  # button is released
@@ -280,10 +280,13 @@ class AudioRemote:
 
                 """ B button (Volume up)"""
                 if GPIO.input(B_pin):  # button is released
-                    draw.polygon([(121, 11), (128, 22), (114, 22)], outline=255, fill=0)  # B
+                    draw.polygon([(121, 8), (128, 19), (114, 19)], outline=255, fill=0)  # B
                 else:  # button is pressed:
-                    draw.polygon([(121, 11), (128, 22), (114, 22)], outline=255, fill=1)  # B filled
+                    draw.polygon([(121, 8), (128, 19), (114, 19)], outline=255, fill=1)  # B filled
                     self.volume(up=True)
+
+
+
 
                 """ A button """
                 if GPIO.input(A_pin):  # button is released
