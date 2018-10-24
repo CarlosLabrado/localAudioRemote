@@ -139,6 +139,8 @@ class AudioRemote:
             self.m_db.child("clients").child(self.m_current_client_id).update({"volume": "{0}".format(new_volume)},
                                                                               self.m_user_token)
 
+        return new_volume
+
     def firebase_post(self, button):
         firebase_data = {
             "buttonPressed": button
@@ -238,8 +240,11 @@ class AudioRemote:
 
         try:
             while 1:
+                client = self.m_clients_info_array[self.m_client_array_index]
 
                 draw.text((40, 28), "TEST", font=font, fill=255)
+
+                volume = int(client['volume'])
 
                 """ UP """
                 if GPIO.input(U_pin):  # button is released
@@ -283,17 +288,16 @@ class AudioRemote:
                     draw.polygon([(121, 8), (128, 19), (114, 19)], outline=255, fill=0)  # B
                 else:  # button is pressed:
                     draw.polygon([(121, 8), (128, 19), (114, 19)], outline=255, fill=1)  # B filled
-                    self.volume(up=True)
-
-
-
+                    volume = self.volume(up=True)
 
                 """ A button """
                 if GPIO.input(A_pin):  # button is released
                     draw.polygon([(114, 43), (128, 43), (121, 54)], outline=255, fill=0)  # A
                 else:  # button is pressed:
                     draw.polygon([(114, 43), (128, 43), (121, 54)], outline=255, fill=1)  # A filled
-                    self.volume(up=False)
+                    volume = self.volume(up=False)
+
+                draw.text((114, 28), "{0}".format(volume), font=font, fill=255)
 
                 if not GPIO.input(A_pin) and not GPIO.input(B_pin) and not GPIO.input(C_pin):
                     # catImage = Image.open('happycat_oled_64.ppm').convert('1')
