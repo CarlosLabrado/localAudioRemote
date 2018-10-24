@@ -248,8 +248,6 @@ class AudioRemote:
 
                 client = self.m_clients_info_array[self.m_client_array_index]
 
-                draw.text((40, 28), "TEST", font=font, fill=255)
-
                 volume = int(client['volume'])
                 if volume == 100:
                     draw.text((114, 28), "MX", font=font, fill=255)
@@ -283,6 +281,7 @@ class AudioRemote:
                     draw.polygon([(12, 24), (12, 40), (0, 32)], outline=255, fill=1)  # left filled
                     self.client_array_left()
                     clear_middle = True
+                    clear_volume = True
 
                 """ RIGHT """
                 if GPIO.input(R_pin):  # button is released
@@ -291,6 +290,7 @@ class AudioRemote:
                     draw.polygon([(97, 24), (110, 32), (97, 40)], outline=255, fill=1)  # right filled
                     self.client_array_right()
                     clear_middle = True
+                    clear_volume = True
 
                 """ CENTER button """
                 if GPIO.input(C_pin):  # button is released
