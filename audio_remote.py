@@ -234,12 +234,12 @@ class AudioRemote:
         # Draw a black filled box to clear the image.
         draw.rectangle((0, 0, width, height), outline=0, fill=0)
 
-        ftn = ImageFont.truetype('/usr/share/fonts/truetype/freefont/FreeMono.ttf', 12)
+        font = ImageFont.load_default()
 
         try:
             while 1:
 
-                draw.text((40, 28), "Test", font=ftn, fill=(255, 255, 255, 255))
+                draw.text((40, 28), "Test", font=font, fill=255)
 
                 """ UP """
                 if GPIO.input(U_pin):  # button is released
