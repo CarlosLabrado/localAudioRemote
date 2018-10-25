@@ -1,9 +1,6 @@
 import pyrebase
 import os
 import arrow
-from firebase_token import FirebaseToken
-from time import time, sleep
-from threading import Thread
 from requests.exceptions import HTTPError
 
 
@@ -22,17 +19,29 @@ class AudioRemote:
 
     def __init__(self):
         """
-               The firebase initialization takes place in the firebase_token.py
-               """
+        The firebase initialization takes place in the firebase_token.py
+        """
         email = os.environ['email']
+        password = os.environ['password']
 
-        self.m_user = FirebaseToken.get_instance().get_user()
+        config = {
+            "apiKey": os.environ['apiKey'],
+            "authDomain": os.environ['authDomain'],
+            "databaseURL": os.environ['databaseURL'],
+            "projectId": os.environ['projectId'],
+            "storageBucket": os.environ['storageBucket'],
+            "messagingSenderId": os.environ['messagingSenderId']
+        }
 
-        # Get the token because we need to send it on every call
-        self.m_user_token = self.m_user['idToken']
+        firebase = pyrebase.initialize_app(config)
 
-        # Get a reference to the database service
-        self.m_db = FirebaseToken.get_instance().get_db()
+        # Get a reference to the auth service
+        self.m_auth = firebase.auth()
+
+        # Log the user in
+        self.m_user = self.m_auth.sign_in_with_email_and_password(email, password)
+
+        self.m_db = firebase.database()
 
         email_formatted = email.replace('.', ',')  # The firebase user can't have dots so we replace them with commas.
 
@@ -41,8 +50,6 @@ class AudioRemote:
         self.get_clients_info(device_id)
         self.m_total_clients = len(self.m_clients_id_array)
         self.m_current_client_id = self.m_clients_id_array[self.m_client_array_index]  # init client id
-
-        Thread(target=self.token_refresher).start()
 
     def get_clients_info(self, device_id):
         """
@@ -73,21 +80,9 @@ class AudioRemote:
             # try to refresh token
             self.on_demand_refresher()
 
-    def token_refresher(self):
-        """
-        Refreshes the token after half an hour. Runs on a thread.
-        :return:
-        """
-        start_time = time()
-
-        while True:
-            self.m_user = FirebaseToken.get_instance().refresh_token()
-            print("token refreshed.")
-            sleep(1800.0 - ((time() - start_time) % 1800.0))
-
     def on_demand_refresher(self):
         print("on demand refresher called.")
-        self.m_user = FirebaseToken.get_instance().refresh_token()
+        self.m_user = self.m_auth.refresh(self.m_user['refreshToken'])
 
     def client_array_left(self):
         """
@@ -306,7 +301,12 @@ class AudioRemote:
                 if time_passed.seconds > 60:
                     clear_middle = True
                 local = utc.to('US/Mountain')
-                date = "{0}:{1}".format(local.hour, local.minute)
+                minute = None
+                if local.minute < 10:
+                    minute = "0{0}".format(local.minute)
+                else:
+                    minute = local.minute
+                date = "{0}:{1}".format(local.hour, minute)
                 draw.text((14, 43), date, font=font, fill=255)
 
                 """ UP """
