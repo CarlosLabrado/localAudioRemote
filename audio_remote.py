@@ -21,8 +21,6 @@ class AudioRemote:
         """
         The firebase initialization takes place in the firebase_token.py
         """
-        email = os.environ['email']
-        password = os.environ['password']
 
         config = {
             "apiKey": os.environ['apiKey'],
@@ -39,10 +37,13 @@ class AudioRemote:
         self.m_auth = firebase.auth()
 
         # Log the user in
-        self.m_user = self.m_auth.sign_in_with_email_and_password(email, password)
+        self.m_user = self.m_auth.sign_in_with_email_and_password(self.m_email, self.m_password)
+        # Get the token because we need to send it on every call
+        self.m_user_token = self.m_user['idToken']
 
         self.m_db = firebase.database()
 
+        email = self.m_email
         email_formatted = email.replace('.', ',')  # The firebase user can't have dots so we replace them with commas.
 
         val = self.m_db.child("users").child(email_formatted).get(self.m_user_token)
