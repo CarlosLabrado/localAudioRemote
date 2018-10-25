@@ -4,6 +4,7 @@ import arrow
 from firebase_token import FirebaseToken
 from time import time, sleep
 from threading import Thread
+from requests.exceptions import HTTPError
 
 
 class AudioRemote:
@@ -48,22 +49,27 @@ class AudioRemote:
         :return:
         """
         index = 0
-        all_clients = self.m_db.child("devices").child(device_id).child("clients").get(self.m_user_token)
-        for client in all_clients.each():
-            if client.val() is not None:  # for some reason the first item always comes none
-                if index == 0:
-                    # if is the first one, UN mute it.
-                    self.m_db.child("clients").child(client.val()).update({"muted": "False"}, self.m_user_token)
-                self.m_clients_id_array.append(client.val())
-                client_info_val = self.m_db.child("clients").child(client.val()).get(self.m_user_token)
-                client_info = client_info_val.val()
-                client = {"muted": client_info['muted'],
-                          "name": client_info["name"],
-                          "parent": client_info["parent"],
-                          "type": client_info["type"],
-                          "volume": client_info["volume"]}
-                self.m_clients_info_array.append(client)
-                index = index + 1
+        try:
+            all_clients = self.m_db.child("devices").child(device_id).child("clients").get(self.m_user_token)
+            for client in all_clients.each():
+                if client.val() is not None:  # for some reason the first item always comes none
+                    if index == 0:
+                        # if is the first one, UN mute it.
+                        self.m_db.child("clients").child(client.val()).update({"muted": "False"}, self.m_user_token)
+                    self.m_clients_id_array.append(client.val())
+                    client_info_val = self.m_db.child("clients").child(client.val()).get(self.m_user_token)
+                    client_info = client_info_val.val()
+                    client = {"muted": client_info['muted'],
+                              "name": client_info["name"],
+                              "parent": client_info["parent"],
+                              "type": client_info["type"],
+                              "volume": client_info["volume"]}
+                    self.m_clients_info_array.append(client)
+                    index = index + 1
+        except HTTPError as e:
+            print(e)
+            # try to refresh token
+            self.on_demand_refresher()
 
     def token_refresher(self):
         """
@@ -74,7 +80,12 @@ class AudioRemote:
 
         while True:
             FirebaseToken.get_instance().refresh_token()
+            print("token refreshed.")
             sleep(1800.0 - ((time() - start_time) % 1800.0))
+
+    def on_demand_refresher(self):
+        print("on demand refresher called.")
+        FirebaseToken.get_instance().refresh_token()
 
     def client_array_left(self):
         """
@@ -110,7 +121,12 @@ class AudioRemote:
         client["muted"] = True
         # Firebase
         client_id = self.m_clients_id_array[index]
-        self.m_db.child("clients").child(client_id).update({"muted": "True"}, self.m_user_token)
+        try:
+            self.m_db.child("clients").child(client_id).update({"muted": "True"}, self.m_user_token)
+        except HTTPError as e:
+            print(e)
+            # try to refresh token
+            self.on_demand_refresher()
 
     def un_mute(self, index):
         # local
@@ -118,7 +134,12 @@ class AudioRemote:
         client["muted"] = False
         # Firebase
         client_id = self.m_clients_id_array[index]
-        self.m_db.child("clients").child(client_id).update({"muted": "False"}, self.m_user_token)
+        try:
+            self.m_db.child("clients").child(client_id).update({"muted": "False"}, self.m_user_token)
+        except HTTPError as e:
+            print(e)
+            # try to refresh token
+            self.on_demand_refresher()
 
     def volume(self, up=True, amount=5):
         """
@@ -138,8 +159,13 @@ class AudioRemote:
             # because python is pass by reference we can just update this reference and it will update the local object.
             client["volume"] = new_volume
             # Firebase call
-            self.m_db.child("clients").child(self.m_current_client_id).update({"volume": "{0}".format(new_volume)},
-                                                                              self.m_user_token)
+            try:
+                self.m_db.child("clients").child(self.m_current_client_id).update({"volume": "{0}".format(new_volume)},
+                                                                                  self.m_user_token)
+            except HTTPError as e:
+                print(e)
+                # try to refresh token
+                self.on_demand_refresher()
 
         return new_volume
 
@@ -147,7 +173,12 @@ class AudioRemote:
         firebase_data = {
             "buttonPressed": button
         }
-        self.m_db.child("testButtons").update(firebase_data, self.m_user_token)
+        try:
+            self.m_db.child("testButtons").update(firebase_data, self.m_user_token)
+        except HTTPError as e:
+            print(e)
+            # try to refresh token
+            self.on_demand_refresher()
 
     def main(self):
         import RPi.GPIO as GPIO
