@@ -1,9 +1,6 @@
 import pyrebase
 import os
 import arrow
-from firebase_token import FirebaseToken
-from time import time, sleep
-from threading import Thread
 from requests.exceptions import HTTPError
 
 
@@ -23,14 +20,29 @@ class AudioRemote:
         The firebase initialization takes place in the firebase_token.py
         """
         email = os.environ['email']
+        password = os.environ['password']
 
-        self.m_user = FirebaseToken.get_instance().get_user()
+        config = {
+            "apiKey": os.environ['apiKey'],
+            "authDomain": os.environ['authDomain'],
+            "databaseURL": os.environ['databaseURL'],
+            "projectId": os.environ['projectId'],
+            "storageBucket": os.environ['storageBucket'],
+            "messagingSenderId": os.environ['messagingSenderId']
+        }
+
+        firebase = pyrebase.initialize_app(config)
+
+        # Get a reference to the auth service
+        self.m_auth = firebase.auth()
+
+        # Log the user in
+        self.m_user = self.m_auth.sign_in_with_email_and_password(email, password)
+
+        self.m_db = firebase.database()
 
         # Get the token because we need to send it on every call
         self.m_user_token = self.m_user['idToken']
-
-        # Get a reference to the database service
-        self.m_db = FirebaseToken.get_instance().get_db()
 
         email_formatted = email.replace('.', ',')  # The firebase user can't have dots so we replace them with commas.
 
@@ -39,8 +51,6 @@ class AudioRemote:
         self.get_clients_info(device_id)
         self.m_total_clients = len(self.m_clients_id_array)
         self.m_current_client_id = self.m_clients_id_array[self.m_client_array_index]  # init client id
-
-        Thread(target=self.token_refresher).start()
 
     def get_clients_info(self, device_id):
         """
@@ -71,21 +81,9 @@ class AudioRemote:
             # try to refresh token
             self.on_demand_refresher()
 
-    def token_refresher(self):
-        """
-        Refreshes the token after half an hour. Runs on a thread.
-        :return:
-        """
-        start_time = time()
-
-        while True:
-            FirebaseToken.get_instance().refresh_token()
-            print("token refreshed.")
-            sleep(1800.0 - ((time() - start_time) % 1800.0))
-
     def on_demand_refresher(self):
         print("on demand refresher called.")
-        FirebaseToken.get_instance().refresh_token()
+        self.m_auth.refresh(self.m_user['refreshToken'])
 
     def client_array_left(self):
         """
@@ -116,12 +114,12 @@ class AudioRemote:
             self.m_current_client_id = self.m_clients_id_array[self.m_client_array_index]
 
     def mute(self, index):
-        # local
-        client = self.m_clients_info_array[index]
-        client["muted"] = True
-        # Firebase
-        client_id = self.m_clients_id_array[index]
         try:
+            # local
+            client = self.m_clients_info_array[index]
+            client["muted"] = True
+            # Firebase
+            client_id = self.m_clients_id_array[index]
             self.m_db.child("clients").child(client_id).update({"muted": "True"}, self.m_user_token)
         except HTTPError as e:
             print(e)
@@ -129,12 +127,12 @@ class AudioRemote:
             self.on_demand_refresher()
 
     def un_mute(self, index):
-        # local
-        client = self.m_clients_info_array[index]
-        client["muted"] = False
-        # Firebase
-        client_id = self.m_clients_id_array[index]
         try:
+            # local
+            client = self.m_clients_info_array[index]
+            client["muted"] = False
+            # Firebase
+            client_id = self.m_clients_id_array[index]
             self.m_db.child("clients").child(client_id).update({"muted": "False"}, self.m_user_token)
         except HTTPError as e:
             print(e)
@@ -148,26 +146,28 @@ class AudioRemote:
         :param amount: defaults to 5
         :return:
         """
-        client = self.m_clients_info_array[self.m_client_array_index]
-        volume = int(client['volume'])
-        new_volume = volume
-        if up:
-            new_volume += amount
-        else:
-            new_volume -= amount
-        if 0 <= new_volume <= 100:
-            # because python is pass by reference we can just update this reference and it will update the local object.
-            client["volume"] = new_volume
-            # Firebase call
-            try:
+        new_volume = 0
+        try:
+            client = self.m_clients_info_array[self.m_client_array_index]
+            volume = int(client['volume'])
+            new_volume = volume
+            if up:
+                new_volume += amount
+            else:
+                new_volume -= amount
+            if 0 <= new_volume <= 100:
+                # because python is pass by reference we can just update this reference and it will update the local
+                # object.
+                client["volume"] = new_volume
+                # Firebase call
                 self.m_db.child("clients").child(self.m_current_client_id).update({"volume": "{0}".format(new_volume)},
                                                                                   self.m_user_token)
-            except HTTPError as e:
-                print(e)
-                # try to refresh token
-                self.on_demand_refresher()
-
-        return new_volume
+        except HTTPError as e:
+            print(e)
+            # try to refresh token
+            self.on_demand_refresher()
+        finally:
+            return new_volume
 
     def firebase_post(self, button):
         firebase_data = {
