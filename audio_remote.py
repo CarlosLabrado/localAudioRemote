@@ -83,7 +83,10 @@ class AudioRemote:
 
     def on_demand_refresher(self):
         print("on demand refresher called.")
+        print("old token {0}".format(self.m_user_token))
         self.m_user = self.m_auth.refresh(self.m_user['refreshToken'])
+        self.m_user_token = self.m_user['idToken']
+        print("new token {0}".format(self.m_user_token))
 
     def client_array_left(self):
         """
