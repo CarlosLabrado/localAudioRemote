@@ -118,12 +118,13 @@ class AudioRemote:
 
     def mute(self, index):
         try:
-            # local
-            client = self.m_clients_info_array[index]
-            client["muted"] = True
             # Firebase
             client_id = self.m_clients_id_array[index]
             self.m_db.child("clients").child(client_id).update({"muted": "True"}, self.m_user_token)
+
+            # local
+            client = self.m_clients_info_array[index]
+            client["muted"] = True
         except HTTPError as e:
             print(e)
             # try to refresh token
@@ -131,12 +132,13 @@ class AudioRemote:
 
     def un_mute(self, index):
         try:
-            # local
-            client = self.m_clients_info_array[index]
-            client["muted"] = False
             # Firebase
             client_id = self.m_clients_id_array[index]
             self.m_db.child("clients").child(client_id).update({"muted": "False"}, self.m_user_token)
+
+            # local
+            client = self.m_clients_info_array[index]
+            client["muted"] = False
         except HTTPError as e:
             print(e)
             # try to refresh token
@@ -159,12 +161,12 @@ class AudioRemote:
             else:
                 new_volume -= amount
             if 0 <= new_volume <= 100:
-                # because python is pass by reference we can just update this reference and it will update the local
-                # object.
-                client["volume"] = new_volume
                 # Firebase call
                 self.m_db.child("clients").child(self.m_current_client_id).update({"volume": "{0}".format(new_volume)},
                                                                                   self.m_user_token)
+                # because python is pass by reference we can just update this reference and it will update the local
+                # object.
+                client["volume"] = new_volume
         except HTTPError as e:
             print(e)
             # try to refresh token
