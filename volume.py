@@ -3,6 +3,11 @@ from subprocess import check_output
 
 
 class Volume:
+    """
+    For the windows version we will use: https://www.rlatour.com/setvol/ Copyright Rob Latour 2018 - All Rights Reserved
+    which is an standalone command line utility.
+    """
+    is_windows = True
 
     def get_volume(self):
         output_volume_bytes = check_output(['osascript', '-e', 'output volume of (get volume settings)'])
@@ -11,33 +16,25 @@ class Volume:
         return volume
 
     def volume_up(self):
-        os.system("osascript -e 'set volume output volume (output volume of (get volume settings)+5)'")
-        self.get_volume()
+        if self.is_windows:
+            os.system("setvol {0}".format("+5"))
+        else:
+            os.system("osascript -e 'set volume output volume (output volume of (get volume settings)+5)'")
 
     def volume_down(self):
-        os.system("osascript -e 'set volume output volume (output volume of (get volume settings)-5)'")
-        self.get_volume()
+        if self.is_windows:
+            os.system("setvol {0}".format("-5"))
+        else:
+            os.system("osascript -e 'set volume output volume (output volume of (get volume settings)-5)'")
 
     def mute(self):
-        os.system("osascript -e 'set volume output muted TRUE'")
+        if self.is_windows:
+            os.system("setvol mute")
+        else:
+            os.system("osascript -e 'set volume output muted TRUE'")
 
     def un_mute(self):
-        os.system("osascript -e 'set volume output muted FALSE'")
-
-    def check_muted(self):
-        output_muted_bytes = check_output(['osascript', '-e', 'output muted of (get volume settings)'])
-        # comes in bytes so we decode it, and then it has some break lines and other weird chars so we rstrip it
-        muted_string = output_muted_bytes.decode().rstrip()
-
-        if muted_string == "false":
-            is_muted = False
+        if self.is_windows:
+            os.system("setvol unmute")
         else:
-            is_muted = True
-
-        return is_muted
-
-import zerorpc
-s = zerorpc.Server(Volume())
-s.bind("tcp://0.0.0.0:4242")
-s.run()
-
+            os.system("osascript -e 'set volume output muted FALSE'")
