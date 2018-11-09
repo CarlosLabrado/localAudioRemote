@@ -1,8 +1,10 @@
-from papirus import PapirusTextPos
+from audio_remote import AudioRemote
+import traceback
 
-# Same as calling "PapirusTextPos(True)"
-text = PapirusTextPos()
+try:
+    audio_remote = AudioRemote()
+    audio_remote.main()
 
-# Write text to the screen at selected point, with an Id
-# This will write "hello world" to the screen with white text and a black background
-text.AddText("hello world", 10, 10, Id="Start", invert=True)
+except Exception as e:
+    print("Bad things happened {0}".format(e))
+    traceback.print_tb(e.__traceback__)
