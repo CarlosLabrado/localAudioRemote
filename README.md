@@ -1,14 +1,16 @@
 # localAudioRemote
 Python firebase project to control the volume of 2 computers, running either MacOSX or Windows.
+Shows an interface where with the arrow keys you move to each computer and either turn volume up and down or mute the computer.
+Whenever you switch from one computer to another, it mutes the first computer.
 
 ## Hardware
-Raspberry Pi 3
-Adafruit 128x64 OLED Bonnet
+* Raspberry Pi 3
+* Adafruit 128x64 OLED Bonnet
 
 ## Software
-Docker compose
-Balena.io
-Debian Stretch image
+* Docker compose
+* Balena.io
+* Debian Stretch image
 
 ## Plugins
 * [arrow](https://arrow.readthedocs.io/en/latest/) Arrow to handle the dates.
